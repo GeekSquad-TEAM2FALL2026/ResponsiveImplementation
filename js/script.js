@@ -49,6 +49,7 @@ document.addEventListener('click', (e) => {
 });
 
 
+
 /** Product listing interactions (Gallery Switcher & Reply Panel) */
 const mainImg = document.getElementById('main-listing-image');
 const thumbBtns = document.querySelectorAll('.thumbnail-btn');
@@ -101,3 +102,15 @@ if (saveBtn) {
         saveBtn.textContent = saved ? 'Saved' : 'Save';
     });
 }
+
+searchDropdown.querySelectorAll('li').forEach((item, index) => {
+    item.addEventListener('click', () => {
+        if (index === 0) {
+            window.location.href = '/searchResultsPage.html?option=1';
+        } else if (index === 1) {
+            window.location.href = '/searchResultsPage.html?option=2';
+        } else if (index === 2) {
+            window.location.href = '/searchResultsPage.html?option=3';
+        }
+    });
+});
