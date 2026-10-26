@@ -34,6 +34,42 @@
             </svg>
             <span>CL</span>
         </a>
-        
+
+        <main class="results-page">
+            <h1>Search Results</h1>
+            <div class="search-controls">
+                <label for="sort-options">Reorder results:</label>
+                <select id="sort-options" name="sort-options">
+                    <option value="relevance">Relevance</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                    <option value="date-newest">Newest</option>
+                    <option value="date-oldest">Oldest</option>
+                </select>
+            </div>
+            <ul class="item-listings">
+                <li class="item">
+                    <h2>Item 1</h2>
+                    <p>Description for item 1</p>
+                    <span class="price">$10</span>
+                </li>
+                <li class="item">
+                    <h2>Item 2</h2>
+                    <p>Description for item 2</p>
+                    <span class="price">$20</span>
+                </li>
+                <li class="item">
+                    <h2>Item 3</h2>
+                    <p>Description for item 3</p>
+                    <span class="price">$30</span>
+                </li>
+                <!-- Add more items as needed -->
+            </ul>
+            <div class="search-results">
+                <!-- Search results will be dynamically inserted here -->
+            </div>
+
+    <script src="js/script.js"></script>
+    <script src="js/form.js"></script>
 </body>
 </html>
