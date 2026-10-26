@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>$800 Moog Theremin - Craigslist</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header class="listing-header">
+        <div class="header-left">
+            <button class="hamburger" id="hamburger-btn" aria-label="ToggleMenu">
+                <span></span><span></span><span></span>
+            </button>
+            <a href="index.html" class="brand-link" aria-label="Craigslist Home">
+                <svg class="peace-icon-sm" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="45" stroke="var(--logo-color)" stroke-width="6" fill="none"/>
+                    <line x1="50" y1="5" x2="50" y2="95" stroke="var(--logo-color)" stroke-width="6"/>
+                    <line x1="50" y1="50" x2="15" y2="85" stroke="var(--logo-color)" stroke-width="6"/>
+                    <line x1="50" y1="50" x2="85" y2="85" stroke="var(--logo-color)" stroke-width="6"/>
+                </svg>
+                <span class="brand-text-desktop">Craigslist</span>
+                <span class="brand-text-mobile">CL</span>
+            </a>
+        </div>
+
+        <nav id="nav-menu" class="nav-menu">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li class="nav-dropdown-container">
+                    <a href="#" id="categories-btn">Categories <span id="cat-arrow">&#9662;</span></a>
+                    <ul class="dropdown-menu categories-list" id="categories-dropdown">
+                        <li>Community</li>
+                        <li>Services</li>
+                        <li>For Sale</li>
+                        <li>Housing</li>
+                        <li>Autos</li>
+                        <li>Jobs</li>
+                        <li>Gigs</li>
+                        <li>Discussion Forums</li>
+                        <li>Resumes</li>
+                    </ul>
+                </li>
+                <li><a href="#">Post</a></li>
+                <li><a href="#">Account</a></li>
+            </ul>
+        </nav>
+
+        <div class="search-container header-search" id="search-container">
+            <input type="text" class="search-input" id="search-input" placeholder="Search" aria-label="Search listings" autocomplete="off">
+            <ul class="dropdown-menu" id="search-dropdown">
+                <li>Instruments</li>
+                <li>Synthesizers</li>
+                <li>Audio Equipment</li>
+            </ul>
+        </div>
+
+        <div class="theme-toggle">
+            <input type="checkbox" id="theme-switch" class="theme-switch">
+            <label for="theme-switch" class="switch-label" aria-label="Toggle Dark Mode">
+                <span class="theme-icon"></span>
+            </label>
+        </div>
+    </header>
+
+    <main class="listing-container">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="index.html">Home</a> <span>&rsaquo;</span>
+            <a href="#">For Sale</a> <span>&rsaquo;</span>
+            <a href="#">Musical Instruments</a>
+        </nav>
+
+        <!-- Mobile Top Action + Title Row -->
+        <div class="mobile-title-row">
+            <button type="button" class="btn-reply" id="reply-btn-mobile">Reply</button>
+            <h1 class="listing-title-mobile">$800 Moog Theremin</h1>
+        </div>
+
+        <!-- Responsive Listing Layout 1-column on mobile, 2 on desktop -->
+        <section class="listing-grid">
+            <!-- Left Column: Image Gallery-->
+            <div class="gallery-column">
+                <div class="gallery-frame">
+                    <div class="main-image-wrapper">
+                        <!-- Temporary Testing Images !!! **** 0000 -->
+                        <img 
+                            id="main-listing-image"
+                            alt="Moog Theremin"
+                            src="images/Theremin1.jpg"
+                        >
+                    </div>
+                    <div class="gallery-dots" id="gallery-dots" aria-label="Image Slide Indicators">
+                        <button class="dot active" data-index="0" aria-label="View Image 1"></button>
+                        <button class="dot" data-index="1" aria-label="View Image 2"></button>
+                        <button class="dot" data-index="2" aria-label="View Image 3"></button>
+                    </div>
+                </div>
+
+                <div class="thumbnail-row" id="thumbnail-row">
+                    <button class="thumbnail-btn active" data-index="0" data-src="images/Theremin1.jpg" data-alt="Moog Theremin" aria-label="View Thumbnail 1">
+                        <img src="images/Theremin1.jpg"></button>
+                    <button class="thumbnail-btn" data-index="1" data-src="images/Theremin2.jpg" data-alt="Effects Pedals" aria-label="View Thumbnail 2">
+                        <img src="images/Theremin2.jpg" alt="Effects Pedals thumbnail"></button>
+                    <button class="thumbnail-btn" data-index="2" data-src="images/Theremin3.jpg" data-alt="Control Panel" aria-label="View Thumbnail 3">
+                        <img src="images/Theremin3.jpg" alt="Control Panel thumbnail"></button>
+                </div>
+            </div>
+
+            <!-- Right Column: Listing Details -->
+            <div class="details-column">
+                <h1 class="listing-title-desktop">$800 Moog Theremin</h1>
+
+                <div class="post-meta-block">
+                    <p class="meta-subtitle">This block of text is for additional information about the listing.</p>
+                    <div class="meta-badges">
+                        <span class="badge">Condition: <strong>Excellent</strong></span>
+                        <span class="badge">Make: <strong>Moog</strong></span>
+                        <span class="badge">Location <strong>Charlotte, NC</strong></span>
+                        <span class="badge">Posted: <strong>2 days ago</strong></span>
+                    </div>
+                </div>
+                
+                <div class="listing-description">
+                    <p>Authentic Moog Etherwave Standard Theremin in excellent working and cosmetic condition. 
+                        Includes detachable nickel-plated brass pitch and volume antennas, original power supply, 
+                        and adjustable tripod mic stand mount.
+                    </p>
+                    <p>Also bundling two classic Boss effects pedals (delay and overdrive) shown in the second photo. 
+                        Calibrated and tested—tracks pitch smoothly across a 5-octave range. Cash or verified local 
+                        pickup preferred.
+                    </p>
+                </div>
+
+                <div class="desktop-actions">
+                    <button type="button" class="btn btn-primary-reply" id="reply-btn-desktop">Reply</button>
+                    <button type="button" class="btn btn-secondary" id="save-btn">Save</button>
+                </div>
+
+                <div class="reply-panel" id="reply-panel" hidden>
+                    <h3>Contact Seller</h3>
+                    <p><strong>Email:</strong> seller@example.com</p>
+                    <p><strong>Phone:</strong> (123) 456-7890</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/script.js"></script>
+
+</body>
+</html>
