@@ -4,36 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search Results - Craigslist</title>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <!--kacey is working on this right now-->
 
 <body>
-    <header class="listing-header">
-
-        <!-- Hamburger Menu -->
-        <button class="hamburger" id="hamburger-btn"
-                aria-label="Open menu">
-            <span></span>
-            <span></span>
-            <span></span>
+    <header>
+        <button class="hamburger" id="hamburger-btn" aria-label="Toggle Menu">
+            <span></span><span></span><span></span>
         </button>
-
-        <!-- Craigslist Logo -->
-        <a href="index.html" class="listing-logo">
-            <svg class="peace-icon" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="45"
-                        stroke="currentColor" stroke-width="5"
-                        fill="none"/>
-                <line x1="50" y1="5" x2="50" y2="95"
-                    stroke="currentColor" stroke-width="5"/>
-                <line x1="50" y1="50" x2="15" y2="85"
-                    stroke="currentColor" stroke-width="5"/>
-                <line x1="50" y1="50" x2="85" y2="85"
-                    stroke="currentColor" stroke-width="5"/>
-            </svg>
-            <span>CL</span>
-        </a>
+        <nav id="nav-menu" class="nav-menu">
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li class="nav-dropdown-container">
+                    <a href="#" id="categories-btn">Categories <span id="cat-arrow">▼</span></a>
+                    <ul class="dropdown-menu categories-list" id="categories-dropdown">
+                        <li>Community</li>
+                        <li>Services</li>
+                        <li>For Sale</li>
+                        <li>Housing</li>
+                        <li>Autos</li>
+                        <li>Jobs</li>
+                        <li>Gigs</li>
+                        <li>Discussion Forums</li>
+                        <li>Resumes</li>
+                    </ul>
+                </li>
+                <li><a href="#">Post</a></li>
+                <li><a href="#">Account</a></li>
+            </ul>
+        </nav>
+        <div class="theme-toggle">
+            <input type="checkbox" id="theme-switch" class="theme-switch">
+            <label for="theme-switch" class="switch-label">
+                <span class="theme-icon"></span>
+            </label>
+        </div>
+    </header>
 
         <main class="results-page">
             <h1>Search Results</h1>
