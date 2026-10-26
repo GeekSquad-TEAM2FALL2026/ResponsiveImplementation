@@ -51,11 +51,11 @@ document.addEventListener('click', (e) => {
 searchDropdown.querySelectorAll('li').forEach((item, index) => {
     item.addEventListener('click', () => {
         if (index === 0) {
-            window.location.href = '/search-results?option=1';
+            window.location.href = '/searchResultsPage.html?option=1';
         } else if (index === 1) {
-            window.location.href = '/search-results?option=2';
+            window.location.href = '/searchResultsPage.html?option=2';
         } else if (index === 2) {
-            window.location.href = '/search-results?option=3';
+            window.location.href = '/searchResultsPage.html?option=3';
         }
     });
 });
