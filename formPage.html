@@ -9,7 +9,11 @@
 </head>
 
 <body>
-    
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
     <div data-include="components/header.html"></div>
 
     <!-- Create Listing Form -->
