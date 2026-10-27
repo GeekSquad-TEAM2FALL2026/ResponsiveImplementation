@@ -1,3 +1,6 @@
+if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark-mode');
+}
 function initializeScripts() {
     const hamburgerBtn = document.getElementById('hamburger-btn');
     const navMenu = document.getElementById('nav-menu');
@@ -16,8 +19,18 @@ function initializeScripts() {
     }
 
     if (themeSwitch) {
+        if (localStorage.getItem('theme') === 'dark') {
+            themeSwitch.checked = true;
+        }
+
         themeSwitch.addEventListener('change', () => {
-            document.body.classList.toggle('dark-mode');
+            if (themeSwitch.checked) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+            }
         });
     }
 
