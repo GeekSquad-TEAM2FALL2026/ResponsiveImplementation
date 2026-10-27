@@ -608,6 +608,21 @@ header {
     color: #888888;
 }
 
+.nav-menu .categories-list li {
+    padding: 0;
+}
+
+.nav-menu .categories-list li a {
+    display: block;
+    padding: 1rem 1.2rem;
+    font-size: inherit; 
+    border-radius: 0; 
+}
+
+.nav-menu .categories-list li a:hover {
+    background-color: transparent;
+}
+
 @media (min-width: 768px) {
     .hamburger {
         display: none;
