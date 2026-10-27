@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -44,58 +45,59 @@
         </div>
     </header> -->
 
-        <main class="results-page">
-            <h1>Search Results</h1>
-            <div class="search-controls">
-                <label for="sort-options">Reorder results:</label>
-                <select id="sort-options" name="sort-options">
-                    <option value="featured">Featured</option>
-                    <option value="price-asc">Price: Low to High</option>
-                    <option value="price-desc">Price: High to Low</option>
-                    <option value="date-newest">Newest</option>
-                    <option value="date-oldest">Oldest</option>
-                </select>
-            </div>
-            <ul class="item-listings">
-                <li class="item">
-                    <h2>Item 1</h2>
-                    <img src="images/placeholderImage.png" alt="placeholder image">
-                    <p>Description for item 1</p>
-                    <span class="price">$10</span>
-                </li>
-                <li class="item">
-                    <h2>Item 2</h2>
-                    <img src="images/placeholderImage.png" alt="placeholder image">
-                    <p>Description for item 2</p>
-                    <span class="price">$50</span>
-                </li>
-                <li class="item">
-                    <h2>Item 3</h2>
-                    <img src="images/placeholderImage.png" alt="placeholder image">
-                    <p>Description for item 3</p>
-                    <span class="price">$25</span>
-                </li>
-                <li class="item">
-                    <h2>Item 4</h2>
-                    <img src="images/placeholderImage.png" alt="placeholder image">
-                    <p>Description for item 4</p>
-                    <span class="price">$200</span>
-                </li>
-                <li class="item">
-                    <h2>Item 5</h2>
-                    <img src="images/placeholderImage.png" alt="placeholder image">
-                    <p>Description for item 5</p>
-                    <span class="price">$550</span>
-                </li>
-                <!-- Add more items as needed -->
-            </ul>
-            <div class="search-results">
-                <!-- Search results will be dynamically inserted here -->
-            </div>
-        </main>
+    <main class="results-page">
+        <h1>Search Results</h1>
+        <div class="search-controls">
+            <label for="sort-options">Reorder results:</label>
+            <select id="sort-options" name="sort-options">
+                <option value="featured">Featured</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="date-newest">Newest</option>
+                <option value="date-oldest">Oldest</option>
+            </select>
+        </div>
+        <ul class="item-listings">
+            <li class="item" style="cursor: pointer;" onclick="window.location.href='listing.html'">
+                <h2><a href="listing.html" style="color: inherit; text-decoration: none;">Musical Instruments</a></h2>
+                <img src="images/Theremin1.jpg" alt="placeholder image">
+                <p>Moog Theremin</p>
+                <span class="price">$800</span>
+            </li>
+            <li class="item">
+                <h2>Item 2</h2>
+                <img src="images/placeholderImage.png" alt="placeholder image">
+                <p>Description for item 2</p>
+                <span class="price">$50</span>
+            </li>
+            <li class="item">
+                <h2>Item 3</h2>
+                <img src="images/placeholderImage.png" alt="placeholder image">
+                <p>Description for item 3</p>
+                <span class="price">$25</span>
+            </li>
+            <li class="item">
+                <h2>Item 4</h2>
+                <img src="images/placeholderImage.png" alt="placeholder image">
+                <p>Description for item 4</p>
+                <span class="price">$200</span>
+            </li>
+            <li class="item">
+                <h2>Item 5</h2>
+                <img src="images/placeholderImage.png" alt="placeholder image">
+                <p>Description for item 5</p>
+                <span class="price">$550</span>
+            </li>
+            <!-- Add more items as needed -->
+        </ul>
+        <div class="search-results">
+            <!-- Search results will be dynamically inserted here -->
+        </div>
+    </main>
 
     <script src="js/HTMLInclude.min.js"></script>
     <script src="js/script.js"></script>
     <script src="js/form.js"></script>
 </body>
+
 </html>
