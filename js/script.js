@@ -114,3 +114,10 @@ searchDropdown.querySelectorAll('li').forEach((item, index) => {
         }
     });
 });
+
+const homeBtn = document.getElementById('home');
+
+homeBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = 'index.html';
+});
