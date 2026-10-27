@@ -547,10 +547,7 @@ header {
     background-color: #ffffff;
 }
 
-.item img {
-    max-width: 100%;
-    height: auto; 
-}
+
 /* Listing Image / Wireframe Box */
 .item-thumbnail {
     width: 75px;
