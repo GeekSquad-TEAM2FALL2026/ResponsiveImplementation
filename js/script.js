@@ -2,9 +2,18 @@ if (localStorage.getItem('theme') === 'dark') {
     document.body.classList.add('dark-mode');
 }
 
+(function setFavicon() {
+    if (document.querySelector('link[rel="icon"]')) return;
+    const link = document.createElement('link');
+    link.rel = 'icon';
+    link.type = 'image/svg+xml';
+    link.href = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" stroke="%238A38F5" stroke-width="8" fill="none"/><line x1="50" y1="5" x2="50" y2="95" stroke="%238A38F5" stroke-width="8"/><line x1="50" y1="50" x2="15" y2="85" stroke="%238A38F5" stroke-width="8"/><line x1="50" y1="50" x2="85" y2="85" stroke="%238A38F5" stroke-width="8"/></svg>`;
+    document.head.appendChild(link);
+})();
+
 // Product Auto-suggestions
 const PRODUCTS_SUGGESTIONS = [
-    {title: 'Moog Theremin', category: 'Musical Instruments', keywords: ['moog', 'theremin', 'synthesizer', 'synth', 'electronic music', 'audio equipment']},
+    {title: 'Moog Theremin', category: 'Musical Instruments', price: '$800', keywords: ['moog', 'theremin', 'synthesizer', 'synth', 'electronic music', 'audio equipment']},
     { title: 'Item 2', category: 'For Sale', price: '$50', keywords: 'description for item 2' },
     { title: 'Item 3', category: 'For Sale', price: '$25', keywords: 'description for item 3' },
     { title: 'Item 4', category: 'For Sale', price: '$200', keywords: 'description for item 4' },
@@ -89,6 +98,7 @@ function initializeScripts() {
         
         const matches = PRODUCTS_SUGGESTIONS.filter(item => {
             if (!query) return true; // Show all if query is empty
+            const KeywordsStr = Array.isArray(item.keywords) ? item.keywords.join(' ') : item.keywords;
             return (
                 item.title.toLowerCase().includes(query) ||
                 item.category.toLowerCase().includes(query) ||
@@ -115,7 +125,6 @@ function initializeScripts() {
                         <span>${item.title}</span>
                         <span class="dropdown-item-category">in ${item.category}</span>
                     </div>
-                    <span class="dropdown-item-price">${item.price}</span>
                 </div>
             `;
             li.addEventListener('click', () => {
@@ -182,7 +191,7 @@ function initializeScripts() {
     });
 
     // filter and sort product cards on search results page
-    const itemListingsContainer = document.getElementById('item-listings');
+    const itemListingsContainer = document.querySelector('.item-listings');
     const sortSelect = document.getElementById('sort-options');
 
     function filterListingsOnPage(queryText) {

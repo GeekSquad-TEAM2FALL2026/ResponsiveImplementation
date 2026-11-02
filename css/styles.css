@@ -185,9 +185,10 @@ header {
     font-weight: bold;
 }
 
-.search-input::placeholder {
-    color: var(--text-color);
+.search-input:focus::placeholder {
+    color: transparent;
 }
+
 
 .dropdown-menu {
     display: none;
