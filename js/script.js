@@ -493,6 +493,7 @@ function initializeScripts() {
         });
     }
 
+     // Return to Home Page
     const homeBtn = document.getElementById('home');
     if (homeBtn) {
         homeBtn.addEventListener('click', (e) => {
@@ -602,7 +603,7 @@ const checkHeaderInterval = setInterval(() => {
         initializeScripts();
     }
 }, 50);
-
+    // Run scripts even if the header does not load
 setTimeout(() => {
     if (checkHeaderInterval) {
         clearInterval(checkHeaderInterval);
@@ -611,3 +612,54 @@ setTimeout(() => {
         }
     }
 }, 3000);
+
+
+// Create Listing Loading State
+
+function setupListingForm() {
+    const listingForm = document.getElementById('listing-form');
+
+    // Only run on the Create Listing page
+    if (!listingForm) return;
+
+    // Stop the form from being set up twice
+    if (listingForm.dataset.loadingSetup === 'true') return;
+
+    const postButton = listingForm.querySelector('.post-btn');
+    const formMessage = document.getElementById('form-message');
+
+    if (!postButton || !formMessage) return;
+
+    listingForm.dataset.loadingSetup = 'true';
+
+    listingForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        // Prevent repeated submissions
+        if (postButton.disabled || loadingNow) return;
+
+        // Disable button while posting
+        postButton.disabled = true;
+        postButton.textContent = 'Posting...';
+        formMessage.textContent = '';
+
+        // Show spinner and then confirmation
+        showLoadingState('Posting your listing...', () => {
+
+            // Enable button again
+            postButton.disabled = false;
+            postButton.textContent = 'Post Listing';
+
+            // Show success message
+            formMessage.textContent =
+                'Your listing has been posted!';
+        });
+    });
+}
+
+// Set up the form when the page loads
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupListingForm);
+} else {
+    setupListingForm();
+}
