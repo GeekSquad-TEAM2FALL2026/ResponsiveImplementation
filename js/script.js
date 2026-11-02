@@ -13,7 +13,7 @@ if (localStorage.getItem('theme') === 'dark') {
 
 // Product Auto-suggestions
 const PRODUCTS_SUGGESTIONS = [
-    {title: 'Moog Theremin', category: 'Musical Instruments', price: '$800', keywords: ['moog', 'theremin', 'synthesizer', 'synth', 'electronic music', 'audio equipment']},
+    { title: 'Moog Theremin', category: 'Musical Instruments', price: '$800', keywords: ['moog', 'theremin', 'synthesizer', 'synth', 'electronic music', 'audio equipment'] },
     { title: 'Item 2', category: 'For Sale', price: '$50', keywords: 'description for item 2' },
     { title: 'Item 3', category: 'For Sale', price: '$25', keywords: 'description for item 3' },
     { title: 'Item 4', category: 'For Sale', price: '$200', keywords: 'description for item 4' },
@@ -21,18 +21,14 @@ const PRODUCTS_SUGGESTIONS = [
 ];
 
 // Loading State for Search and Posting
-
 let loadingNow = false;
 
 function showLoadingState(message, nextStep) {
-    // Prevent multiple loading screens
     if (loadingNow) return;
     loadingNow = true;
 
-    // Create the loading screen
     const overlay = document.createElement('div');
     overlay.className = 'loading-overlay';
-
     overlay.innerHTML = `
         <div class="loading-box" role="status" aria-live="polite">
             <div class="loading-spinner" aria-hidden="true"></div>
@@ -40,18 +36,14 @@ function showLoadingState(message, nextStep) {
         </div>
     `;
 
-    // Set the message and display the loading screen
     overlay.querySelector('.loading-text').textContent = message;
     document.body.appendChild(overlay);
     document.body.setAttribute('aria-busy', 'true');
 
-    // Simulate a short loading delay
     setTimeout(() => {
         overlay.remove();
         document.body.removeAttribute('aria-busy');
         loadingNow = false;
-
-        // Continue after loading finishes
         nextStep();
     }, 1000);
 }
@@ -68,22 +60,15 @@ function initializeScripts() {
     const searchInput = document.getElementById('search-input');
     const searchDropdown = document.getElementById('search-dropdown');
 
-    // Hide Header Search on main page for larger hero search bar
     const heroSearch = document.getElementById('search-container');
-    if (heroSearch) {
-        document.body.classList.add('has-hero-search');
-    }
+    if (heroSearch) document.body.classList.add('has-hero-search');
 
     if (hamburgerBtn && navMenu) {
-        hamburgerBtn.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
-        });
+        hamburgerBtn.addEventListener('click', () => navMenu.classList.toggle('active'));
     }
 
     if (themeSwitch) {
-        if (localStorage.getItem('theme') === 'dark') {
-            themeSwitch.checked = true;
-        }
+        if (localStorage.getItem('theme') === 'dark') themeSwitch.checked = true;
 
         themeSwitch.addEventListener('change', () => {
             if (themeSwitch.checked) {
@@ -99,50 +84,55 @@ function initializeScripts() {
     if (categoriesBtn && categoriesDropdown && catArrow) {
         categoriesBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            e.stopPropagation(); 
+            e.stopPropagation();
             categoriesDropdown.classList.toggle('active');
-            
+
             if (searchDropdown) searchDropdown.classList.remove('active');
             catArrow.textContent = categoriesDropdown.classList.contains('active') ? '▲' : '▼';
         });
     }
 
-    // Interactive Search Logic for hero search and header search
+    const accountLinks = Array.from(document.querySelectorAll('.nav-menu a')).filter(a => a.textContent.includes('Account'));
+    
+    accountLinks.forEach(link => {
+        link.href = '#'; 
+        link.textContent = localStorage.getItem('isLoggedIn') === 'true' ? 'Account (Log Out)' : 'Account (Log In)';
+        
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            localStorage.setItem('isLoggedIn', !loggedIn);
+            
+            alert(!loggedIn ? 'Logged in as Demo User!' : 'Logged out successfully.');
+            window.location.reload();
+        });
+    });
+
+    // Interactive Search Logic
     const searchContainers = document.querySelectorAll('.js-search-container, #search-container');
     const urlParams = new URLSearchParams(window.location.search);
     const initialQuery = urlParams.get('q') || '';
 
-    
-// Search for products with a loading state
-function executeProductSearch(queryText) {
-    const query = queryText.trim().toLowerCase();
+    function executeProductSearch(queryText) {
+        const query = queryText.trim().toLowerCase();
+        const resultUrl = query ? `searchResultsPage.html?q=${encodeURIComponent(query)}` : 'searchResultsPage.html';
 
-    const resultUrl = query
-        ? `searchResultsPage.html?q=${encodeURIComponent(query)}`
-        : 'searchResultsPage.html';
-
-    // Show spinner before displaying search results
-    showLoadingState('Searching listings...', () => {
-
-        // If already on results page, update the results
-        if (window.location.pathname.includes('searchResultsPage.html')) {
-            window.history.pushState({}, '', resultUrl);
-            filterListingsOnPage(query);
-        } else {
-            // Otherwise go to the results page
-            window.location.href = resultUrl;
-        }
-
-    });
-}
-
+        showLoadingState('Searching listings...', () => {
+            if (window.location.pathname.includes('searchResultsPage.html')) {
+                window.history.pushState({}, '', resultUrl);
+                filterListingsOnPage(query);
+            } else {
+                window.location.href = resultUrl;
+            }
+        });
+    }
 
     function renderDropdownSuggestions(dropdownEl, inputEl, filterText) {
         const query = filterText.trim().toLowerCase();
         dropdownEl.innerHTML = '';
-        
+
         const matches = PRODUCTS_SUGGESTIONS.filter(item => {
-            if (!query) return true; // Show all if query is empty
+            if (!query) return true;
             const KeywordsStr = Array.isArray(item.keywords) ? item.keywords.join(' ') : item.keywords;
             return (
                 item.title.toLowerCase().includes(query) ||
@@ -181,28 +171,24 @@ function executeProductSearch(queryText) {
         });
     }
 
-    // Search Containers
     searchContainers.forEach(container => {
         const inputEl = container.querySelector('.js-search-input, #search-input');
         const dropdownEl = container.querySelector('.js-search-dropdown, #search-dropdown');
         if (!inputEl || !dropdownEl) return;
 
-        if(initialQuery) {
-            inputEl.value = initialQuery;
-        }
+        if (initialQuery) inputEl.value = initialQuery;
 
         inputEl.addEventListener('focus', () => {
             renderDropdownSuggestions(dropdownEl, inputEl, inputEl.value);
             dropdownEl.classList.add('active');
             if (categoriesDropdown) categoriesDropdown.classList.remove('active');
-            if (catArrow) catArrow.textContent = '▼'; // Reset arrow when opening search
+            if (catArrow) catArrow.textContent = '▼';
         });
 
         inputEl.addEventListener('input', () => {
             renderDropdownSuggestions(dropdownEl, inputEl, inputEl.value);
             dropdownEl.classList.add('active');
 
-            // If on search results page, update the URL and filter listings without reloading
             if (window.location.pathname.includes('searchResultsPage.html')) {
                 filterListingsOnPage(inputEl.value.trim().toLowerCase());
             }
@@ -220,7 +206,6 @@ function executeProductSearch(queryText) {
         });
     });
 
-    // close dropdown when clicking outside
     document.addEventListener('click', (e) => {
         searchContainers.forEach(container => {
             const dropdownEl = container.querySelector('.js-search-dropdown, #search-dropdown');
@@ -235,9 +220,59 @@ function executeProductSearch(queryText) {
         }
     });
 
-    // filter and sort product cards on search results page
+    // Grid Rendering & Filtering
     const itemListingsContainer = document.querySelector('.item-listings');
     const sortSelect = document.getElementById('sort-options');
+
+    // Add user-created listings to the grid
+    if (itemListingsContainer) {
+        const userListings = JSON.parse(localStorage.getItem('userListings') || '[]');
+
+        userListings.forEach(listing => {
+            const li = document.createElement('li');
+            li.className = 'item';
+
+            // Simple click to navigate to the listing page
+            li.onclick = () => {
+                window.location.href = `listing.html?id=${listing.id}`;
+            };
+
+            li.innerHTML = `
+            <div class="item-image-wrapper">
+                <img src="${listing.image}" alt="${listing.title}">
+            </div>
+            <div class="item-details">
+                <span class="price">$${listing.price}</span>
+                <h2 class="item-title">${listing.title}</h2>
+                <span class="item-location">${listing.location}</span>
+            </div>
+        `;
+            itemListingsContainer.prepend(li);
+        });
+
+        itemListingsContainer.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                window.location.href = `formPage.html?edit=${this.getAttribute('data-id')}`;
+            });
+        });
+
+        itemListingsContainer.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+
+                const idToDelete = this.getAttribute('data-id');
+
+                let currentListings = JSON.parse(localStorage.getItem('userListings') || '[]');
+
+                currentListings = currentListings.filter(l => String(l.id) !== String(idToDelete));
+
+                localStorage.setItem('userListings', JSON.stringify(currentListings));
+
+                this.closest('.item').remove();
+            });
+        });
+    }
 
     function filterListingsOnPage(queryText) {
         if (!itemListingsContainer) return;
@@ -277,7 +312,6 @@ function executeProductSearch(queryText) {
     }
 
     if (sortSelect && itemListingsContainer) {
-        // Store original order using correct container reference
         Array.from(itemListingsContainer.querySelectorAll('.item')).forEach((item, index) => {
             item.dataset.originalIndex = index;
         });
@@ -295,14 +329,14 @@ function executeProductSearch(queryText) {
                 if (sortVal === 'price-asc') return priceA - priceB;
                 if (sortVal === 'price-desc') return priceB - priceA;
                 if (sortVal === 'date-newest') return indexB - indexA;
-                return indexA - indexB; // default / featured
+                return indexA - indexB;
             });
 
             items.forEach(item => itemListingsContainer.appendChild(item));
         });
     }
 
-    // listing page gallery and reply panel logic
+    // Listing Page UI Logic
     const mainImg = document.getElementById('main-listing-image');
     const thumbBtns = document.querySelectorAll('.thumbnail-btn');
     const dots = document.querySelectorAll('.dot');
@@ -310,7 +344,7 @@ function executeProductSearch(queryText) {
     if (mainImg && thumbBtns.length > 0) {
         function setActiveSlide(index) {
             const targetThumb = thumbBtns[index];
-            if(!targetThumb) return;
+            if (!targetThumb) return;
 
             mainImg.src = targetThumb.dataset.src;
             mainImg.alt = targetThumb.dataset.alt;
@@ -319,13 +353,8 @@ function executeProductSearch(queryText) {
             dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
         }
 
-        thumbBtns.forEach(btn => {
-            btn.addEventListener('click', () => setActiveSlide(Number(btn.dataset.index)));
-        });
-
-        dots.forEach(dot => {
-            dot.addEventListener('click', () => setActiveSlide(Number(dot.dataset.index)));
-        });
+        thumbBtns.forEach(btn => btn.addEventListener('click', () => setActiveSlide(Number(btn.dataset.index))));
+        dots.forEach(dot => dot.addEventListener('click', () => setActiveSlide(Number(dot.dataset.index))));
     }
 
     const replyPanel = document.getElementById('reply-panel');
@@ -343,46 +372,126 @@ function executeProductSearch(queryText) {
                 replyPanel.setAttribute('hidden', '');
             }
         }
-        if(replyMobile) replyMobile.addEventListener('click', toggleReplyPanel);
-        if(replyDesktop) replyDesktop.addEventListener('click', toggleReplyPanel);
+        if (replyMobile) replyMobile.addEventListener('click', toggleReplyPanel);
+        if (replyDesktop) replyDesktop.addEventListener('click', toggleReplyPanel);
     }
 
     if (saveBtn) {
-        saveBtn.addEventListener('click', () =>  {
+        saveBtn.addEventListener('click', () => {
             const saved = saveBtn.classList.toggle('saved');
             saveBtn.textContent = saved ? 'Saved' : 'Save';
         });
     }
 
-// Create Listing Loading State
+    // Create / Edit Listing Logic
+    const listingForm = document.getElementById('listing-form');
+    if (listingForm) {
+        const postButton = listingForm.querySelector('.post-btn');
+        const formMessage = document.getElementById('form-message');
+        const photoInput = document.getElementById('photos');
+        const photoBoxes = document.querySelectorAll('.photo-box');
 
-const listingForm = document.getElementById('listing-form');
+        const urlParams = new URLSearchParams(window.location.search);
+        const editId = urlParams.get('edit');
 
-if (listingForm) {
-    const postButton = listingForm.querySelector('.post-btn');
-    const formMessage = document.getElementById('form-message');
+        let currentImageBase64 = 'images/placeholderImage.png';
 
-    listingForm.addEventListener('submit', (event) => {
-        event.preventDefault();
+        // Auto-format price with commas
+        const priceInput = document.getElementById('price');
+        if (priceInput) {
+            priceInput.addEventListener('input', function (e) {
+                let rawValue = this.value.replace(/[^0-9]/g, '');
+                if (rawValue !== '') {
+                    this.value = parseInt(rawValue, 10).toLocaleString('en-US');
+                } else {
+                    this.value = '';
+                }
+            });
+        }
 
-        // Do not allow multiple submissions
-        if (postButton.disabled) return;
+        // Handle Edit Form Pre-fill
+        if (editId) {
+            const userListings = JSON.parse(localStorage.getItem('userListings') || '[]');
+            const listingToEdit = userListings.find(l => l.id === editId);
 
-        // Disable the button while loading
-        postButton.disabled = true;
-        postButton.textContent = 'Posting...';
-        formMessage.textContent = '';
+            if (listingToEdit) {
+                document.querySelector('.listing-page h1').textContent = 'Edit Listing';
+                document.getElementById('listing-title').value = listingToEdit.title;
+                document.getElementById('category').value = listingToEdit.category;
+                document.getElementById('price').value = listingToEdit.price;
+                document.getElementById('location').value = listingToEdit.location;
+                if (document.getElementById('tags')) document.getElementById('tags').value = listingToEdit.tags || '';
+                document.getElementById('description').value = listingToEdit.description;
 
-        // Show loading screen and then confirmation
-        showLoadingState('Posting your listing...', () => {
-            postButton.disabled = false;
-            postButton.textContent = 'Post Listing';
+                currentImageBase64 = listingToEdit.image;
+                photoBoxes[0].innerHTML = `<img src="${currentImageBase64}" style="width:100%; height:100%; object-fit:cover; border-radius:6px;">`;
+                photoBoxes[0].style.border = 'none';
+                postButton.textContent = 'Update Listing';
+            }
+        }
 
-            formMessage.textContent =
-                'Your listing has been posted!';
+        // Handle Image Upload & Preview
+        if (photoInput) {
+            photoInput.addEventListener('change', function (e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        currentImageBase64 = event.target.result;
+                        photoBoxes[0].innerHTML = `<img src="${currentImageBase64}" style="width:100%; height:100%; object-fit:cover; border-radius:6px;">`;
+                        photoBoxes[0].style.border = 'none';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        listingForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            if (postButton.disabled) return;
+
+            postButton.disabled = true;
+
+            const newListing = {
+                id: editId ? editId : Date.now().toString(),
+                title: document.getElementById('listing-title').value,
+                category: document.getElementById('category').value,
+                price: document.getElementById('price').value,
+                location: document.getElementById('location').value,
+                tags: document.getElementById('tags').value, // NEW: Capture tags
+                description: document.getElementById('description').value,
+                image: currentImageBase64
+            };
+
+            showLoadingState(editId ? 'Updating listing...' : 'Posting your listing...', () => {
+                let existingListings = JSON.parse(localStorage.getItem('userListings') || '[]');
+
+                if (editId) {
+                    const index = existingListings.findIndex(l => l.id === editId);
+                    if (index !== -1) existingListings[index] = newListing;
+                } else {
+                    existingListings.push(newListing);
+                }
+
+                localStorage.setItem('userListings', JSON.stringify(existingListings));
+
+                if (editId) {
+                    window.location.href = 'searchResultsPage.html';
+                } else {
+                    postButton.disabled = false;
+                    postButton.textContent = 'Post Another Listing';
+                    formMessage.textContent = 'Your listing has been posted!';
+
+                    listingForm.reset();
+                    currentImageBase64 = 'images/placeholderImage.png';
+                    photoBoxes[0].innerHTML = '+';
+                    photoBoxes[0].style.border = '1px solid var(--text-color)';
+                }
+            
+            
+            });
         });
-    });
-}
+    }
 
     const homeBtn = document.getElementById('home');
     if (homeBtn) {
@@ -391,13 +500,106 @@ if (listingForm) {
             window.location.href = 'index.html';
         });
     }
+
+   // Dynamic Listing Hydration
+    if (window.location.pathname.includes('listing.html')) {
+        const urlParams2 = new URLSearchParams(window.location.search);
+        const listingId = urlParams2.get('id');
+
+        if (listingId) {
+            const userListings = JSON.parse(localStorage.getItem('userListings') || '[]');
+            const listing = userListings.find(l => l.id === listingId);
+
+            if (listing) {
+                document.title = `$${listing.price} ${listing.title} - Craigslist`;
+
+                const mobileTitle = document.querySelector('.listing-title-mobile');
+                if (mobileTitle) mobileTitle.textContent = `$${listing.price} ${listing.title}`;
+
+                const desktopTitle = document.querySelector('.listing-title-desktop');
+                if (desktopTitle) desktopTitle.textContent = `$${listing.price} ${listing.title}`;
+
+                const mainImage = document.getElementById('main-listing-image');
+                if (mainImage) {
+                    mainImage.src = listing.image;
+                    mainImage.alt = listing.title;
+                }
+
+                const locationSubtitle = document.getElementById('listing-location');
+                if (locationSubtitle) locationSubtitle.textContent = listing.location;
+
+                const badgesContainer = document.getElementById('listing-badges');
+                if (badgesContainer) {
+                    badgesContainer.innerHTML = ''; 
+                    
+                    if (listing.tags) {
+                        const tagArray = listing.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+                        tagArray.forEach(tag => {
+                            const span = document.createElement('span');
+                            span.className = 'badge';
+                            span.textContent = tag;
+                            badgesContainer.appendChild(span);
+                        });
+                    }
+                }
+
+                const descContainer = document.querySelector('.listing-description');
+                if (descContainer) descContainer.innerHTML = `<p>${listing.description}</p>`;
+
+                const thumbRow = document.getElementById('thumbnail-row');
+                if (thumbRow) thumbRow.style.display = 'none';
+                const galleryDots = document.getElementById('gallery-dots');
+                if (galleryDots) galleryDots.style.display = 'none';
+
+                if (localStorage.getItem('isLoggedIn') === 'true') {
+                    const authorActions = document.createElement('div');
+                    authorActions.style.display = 'flex';
+                    authorActions.style.alignItems = 'center';
+                    authorActions.style.gap = '1rem';
+                    authorActions.style.marginTop = '1rem';
+                    authorActions.style.padding = '1rem';
+                    authorActions.style.backgroundColor = 'var(--secondary-color)';
+                    authorActions.style.borderRadius = '8px';
+                    authorActions.style.width = '100%';
+                    authorActions.style.maxWidth = '420px'; 
+                    
+                    authorActions.innerHTML = `
+                        <div style="flex: 1;"><strong>Post Options</strong></div>
+                        <button class="btn" id="listing-edit-btn" style="padding: 0.5rem 1rem; width: auto; min-width: 0; font-size: 1rem;">Edit</button>
+                        <button class="btn" id="listing-delete-btn" style="padding: 0.5rem 1rem; width: auto; min-width: 0; font-size: 1rem; background-color: #ff4444; color: white;">Delete</button>
+                    `;
+                    
+                    // Place it directly below the Reply/Save buttons instead of the description
+                    const desktopActions = document.querySelector('.desktop-actions');
+                    if (desktopActions) {
+                        desktopActions.insertAdjacentElement('afterend', authorActions);
+                    }
+
+                    document.getElementById('listing-edit-btn').onclick = () => {
+                        window.location.href = `formPage.html?edit=${listing.id}`;
+                    };
+                    
+                    document.getElementById('listing-delete-btn').onclick = () => {
+                        if (confirm('Are you sure you want to delete this listing permanently?')) {
+                            let currentListings = JSON.parse(localStorage.getItem('userListings') || '[]');
+                            currentListings = currentListings.filter(l => String(l.id) !== String(listing.id));
+                            localStorage.setItem('userListings', JSON.stringify(currentListings));
+                            
+                            alert('Listing deleted.');
+                            window.location.href = 'searchResultsPage.html'; 
+                        }
+                    };
+                }
+            }
+        }
+    }
 }
 
-
+// Initializer Watcher
 const checkHeaderInterval = setInterval(() => {
     if (document.getElementById('hamburger-btn')) {
-        clearInterval(checkHeaderInterval); // Stop checking
-        initializeScripts(); // Run the scripts
+        clearInterval(checkHeaderInterval);
+        initializeScripts();
     }
 }, 50);
 
@@ -405,7 +607,7 @@ setTimeout(() => {
     if (checkHeaderInterval) {
         clearInterval(checkHeaderInterval);
         if (!document.getElementById('hamburger-btn')) {
-            initializeScripts(); 
+            initializeScripts();
         }
     }
 }, 3000);

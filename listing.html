@@ -60,17 +60,9 @@
             <!-- Right Column: Listing Details -->
             <div class="details-column">
                 <h1 class="listing-title-desktop">$800 Moog Theremin</h1>
-
-                <div class="post-meta-block">
-                    <p class="meta-subtitle">This block of text is for additional information about the listing.</p>
-                    <div class="meta-badges">
-                        <span class="badge">Condition: <strong>Excellent</strong></span>
-                        <span class="badge">Make: <strong>Moog</strong></span>
-                        <span class="badge">Location <strong>Charlotte, NC</strong></span>
-                        <span class="badge">Posted: <strong>2 days ago</strong></span>
-                    </div>
-                </div>
                 
+                <p class="meta-subtitle" id="listing-location" style="margin-top: -10px; color: var(--image-placehold);">Charlotte, NC</p>
+
                 <div class="listing-description">
                     <p>Authentic Moog Etherwave Standard Theremin in excellent working and cosmetic condition. 
                         Includes detachable nickel-plated brass pitch and volume antennas, original power supply, 
@@ -81,7 +73,24 @@
                         pickup preferred.
                     </p>
                 </div>
+            
+                <div class="desktop-actions">
+                    <button type="button" class="btn btn-primary-reply" id="reply-btn-desktop">Reply</button>
+                    <button type="button" class="btn btn-secondary" id="save-btn">Save</button>
+                </div>
 
+                <div class="reply-panel" id="reply-panel" hidden>
+                    <h3>Contact Seller</h3>
+                    <p><strong>Email:</strong> seller@example.com</p>
+                    <p><strong>Phone:</strong> (123) 456-7890</p>
+                </div>
+                
+                <div class="meta-badges" id="listing-badges" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--secondary-color);">
+                    <span class="badge">Condition: <strong>Excellent</strong></span>
+                    <span class="badge">Make: <strong>Moog</strong></span>
+                    <span class="badge">Posted: <strong>2 days ago</strong></span>
+                </div>
+            </div>
                 <div class="desktop-actions">
                     <button type="button" class="btn btn-primary-reply" id="reply-btn-desktop">Reply</button>
                     <button type="button" class="btn btn-secondary" id="save-btn">Save</button>
