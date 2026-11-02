@@ -2,14 +2,59 @@ if (localStorage.getItem('theme') === 'dark') {
     document.body.classList.add('dark-mode');
 }
 
+(function setFavicon() {
+    if (document.querySelector('link[rel="icon"]')) return;
+    const link = document.createElement('link');
+    link.rel = 'icon';
+    link.type = 'image/svg+xml';
+    link.href = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" stroke="%238A38F5" stroke-width="8" fill="none"/><line x1="50" y1="5" x2="50" y2="95" stroke="%238A38F5" stroke-width="8"/><line x1="50" y1="50" x2="15" y2="85" stroke="%238A38F5" stroke-width="8"/><line x1="50" y1="50" x2="85" y2="85" stroke="%238A38F5" stroke-width="8"/></svg>`;
+    document.head.appendChild(link);
+})();
+
 // Product Auto-suggestions
 const PRODUCTS_SUGGESTIONS = [
-    {title: 'Moog Theremin', category: 'Musical Instruments', keywords: ['moog', 'theremin', 'synthesizer', 'synth', 'electronic music', 'audio equipment']},
+    {title: 'Moog Theremin', category: 'Musical Instruments', price: '$800', keywords: ['moog', 'theremin', 'synthesizer', 'synth', 'electronic music', 'audio equipment']},
     { title: 'Item 2', category: 'For Sale', price: '$50', keywords: 'description for item 2' },
     { title: 'Item 3', category: 'For Sale', price: '$25', keywords: 'description for item 3' },
     { title: 'Item 4', category: 'For Sale', price: '$200', keywords: 'description for item 4' },
     { title: 'Item 5', category: 'For Sale', price: '$550', keywords: 'description for item 5' }
 ];
+
+// Loading State for Search and Posting
+
+let loadingNow = false;
+
+function showLoadingState(message, nextStep) {
+    // Prevent multiple loading screens
+    if (loadingNow) return;
+    loadingNow = true;
+
+    // Create the loading screen
+    const overlay = document.createElement('div');
+    overlay.className = 'loading-overlay';
+
+    overlay.innerHTML = `
+        <div class="loading-box" role="status" aria-live="polite">
+            <div class="loading-spinner" aria-hidden="true"></div>
+            <p class="loading-text"></p>
+        </div>
+    `;
+
+    // Set the message and display the loading screen
+    overlay.querySelector('.loading-text').textContent = message;
+    document.body.appendChild(overlay);
+    document.body.setAttribute('aria-busy', 'true');
+
+    // Simulate a short loading delay
+    setTimeout(() => {
+        overlay.remove();
+        document.body.removeAttribute('aria-busy');
+        loadingNow = false;
+
+        // Continue after loading finishes
+        nextStep();
+    }, 1000);
+}
 
 
 function initializeScripts() {
@@ -67,21 +112,30 @@ function initializeScripts() {
     const urlParams = new URLSearchParams(window.location.search);
     const initialQuery = urlParams.get('q') || '';
 
-    function executeProductSearch(queryText) {
-        const trimmed = queryText.trim().toLowerCase();
-        const isResultPage = window.location.pathname.includes('searchResultsPage.html');
+    
+// Search for products with a loading state
+function executeProductSearch(queryText) {
+    const query = queryText.trim().toLowerCase();
 
-        if (isResultPage) {
-            // Update URL without reloading the page
-            const newUrl = trimmed ? `/searchResultsPage.html?q=${encodeURIComponent(trimmed)}` : '/searchResultsPage.html';
-            window.history.pushState({}, '', newUrl);
-            filterListingsOnPage(trimmed);
+    const resultUrl = query
+        ? `searchResultsPage.html?q=${encodeURIComponent(query)}`
+        : 'searchResultsPage.html';
+
+    // Show spinner before displaying search results
+    showLoadingState('Searching listings...', () => {
+
+        // If already on results page, update the results
+        if (window.location.pathname.includes('searchResultsPage.html')) {
+            window.history.pushState({}, '', resultUrl);
+            filterListingsOnPage(query);
         } else {
-            // Redirect to search results page with query
-            const targetUrl = trimmed ? `/searchResultsPage.html?q=${encodeURIComponent(trimmed)}` : '/searchResultsPage.html';
-            window.location.href = targetUrl;
+            // Otherwise go to the results page
+            window.location.href = resultUrl;
         }
-    }
+
+    });
+}
+
 
     function renderDropdownSuggestions(dropdownEl, inputEl, filterText) {
         const query = filterText.trim().toLowerCase();
@@ -89,6 +143,7 @@ function initializeScripts() {
         
         const matches = PRODUCTS_SUGGESTIONS.filter(item => {
             if (!query) return true; // Show all if query is empty
+            const KeywordsStr = Array.isArray(item.keywords) ? item.keywords.join(' ') : item.keywords;
             return (
                 item.title.toLowerCase().includes(query) ||
                 item.category.toLowerCase().includes(query) ||
@@ -115,7 +170,6 @@ function initializeScripts() {
                         <span>${item.title}</span>
                         <span class="dropdown-item-category">in ${item.category}</span>
                     </div>
-                    <span class="dropdown-item-price">${item.price}</span>
                 </div>
             `;
             li.addEventListener('click', () => {
@@ -182,7 +236,7 @@ function initializeScripts() {
     });
 
     // filter and sort product cards on search results page
-    const itemListingsContainer = document.getElementById('item-listings');
+    const itemListingsContainer = document.querySelector('.item-listings');
     const sortSelect = document.getElementById('sort-options');
 
     function filterListingsOnPage(queryText) {
@@ -299,6 +353,36 @@ function initializeScripts() {
             saveBtn.textContent = saved ? 'Saved' : 'Save';
         });
     }
+
+// Create Listing Loading State
+
+const listingForm = document.getElementById('listing-form');
+
+if (listingForm) {
+    const postButton = listingForm.querySelector('.post-btn');
+    const formMessage = document.getElementById('form-message');
+
+    listingForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        // Do not allow multiple submissions
+        if (postButton.disabled) return;
+
+        // Disable the button while loading
+        postButton.disabled = true;
+        postButton.textContent = 'Posting...';
+        formMessage.textContent = '';
+
+        // Show loading screen and then confirmation
+        showLoadingState('Posting your listing...', () => {
+            postButton.disabled = false;
+            postButton.textContent = 'Post Listing';
+
+            formMessage.textContent =
+                'Your listing has been posted!';
+        });
+    });
+}
 
     const homeBtn = document.getElementById('home');
     if (homeBtn) {
