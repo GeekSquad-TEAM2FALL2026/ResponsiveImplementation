@@ -354,36 +354,7 @@ function executeProductSearch(queryText) {
         });
     }
 
-// Create Listing Loading State
-
-const listingForm = document.getElementById('listing-form');
-
-if (listingForm) {
-    const postButton = listingForm.querySelector('.post-btn');
-    const formMessage = document.getElementById('form-message');
-
-    listingForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-
-        // Do not allow multiple submissions
-        if (postButton.disabled) return;
-
-        // Disable the button while loading
-        postButton.disabled = true;
-        postButton.textContent = 'Posting...';
-        formMessage.textContent = '';
-
-        // Show loading screen and then confirmation
-        showLoadingState('Posting your listing...', () => {
-            postButton.disabled = false;
-            postButton.textContent = 'Post Listing';
-
-            formMessage.textContent =
-                'Your listing has been posted!';
-        });
-    });
-}
-
+     // Return to Home Page
     const homeBtn = document.getElementById('home');
     if (homeBtn) {
         homeBtn.addEventListener('click', (e) => {
@@ -393,14 +364,14 @@ if (listingForm) {
     }
 }
 
-
+    // Wait for the header to load before running scripts
 const checkHeaderInterval = setInterval(() => {
     if (document.getElementById('hamburger-btn')) {
         clearInterval(checkHeaderInterval); // Stop checking
         initializeScripts(); // Run the scripts
     }
 }, 50);
-
+    // Run scripts even if the header does not load
 setTimeout(() => {
     if (checkHeaderInterval) {
         clearInterval(checkHeaderInterval);
@@ -409,3 +380,54 @@ setTimeout(() => {
         }
     }
 }, 3000);
+
+
+// Create Listing Loading State
+
+function setupListingForm() {
+    const listingForm = document.getElementById('listing-form');
+
+    // Only run on the Create Listing page
+    if (!listingForm) return;
+
+    // Stop the form from being set up twice
+    if (listingForm.dataset.loadingSetup === 'true') return;
+
+    const postButton = listingForm.querySelector('.post-btn');
+    const formMessage = document.getElementById('form-message');
+
+    if (!postButton || !formMessage) return;
+
+    listingForm.dataset.loadingSetup = 'true';
+
+    listingForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        // Prevent repeated submissions
+        if (postButton.disabled || loadingNow) return;
+
+        // Disable button while posting
+        postButton.disabled = true;
+        postButton.textContent = 'Posting...';
+        formMessage.textContent = '';
+
+        // Show spinner and then confirmation
+        showLoadingState('Posting your listing...', () => {
+
+            // Enable button again
+            postButton.disabled = false;
+            postButton.textContent = 'Post Listing';
+
+            // Show success message
+            formMessage.textContent =
+                'Your listing has been posted!';
+        });
+    });
+}
+
+// Set up the form when the page loads
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupListingForm);
+} else {
+    setupListingForm();
+}
