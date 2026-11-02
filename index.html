@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 
-<body>
+<body class="has-hero-search">
     <script>
         if (localStorage.getItem('theme') === 'dark') {
             document.body.classList.add('dark-mode');
@@ -59,9 +59,9 @@
             <h1 class="logo-text">Craigslist</h1>
         </div>
 
-        <div class="search-container" id="search-container">
-            <input type="text" class="search-input" id="search-input" placeholder="Search" autocomplete="off">
-            <ul class="dropdown-menu" id="search-dropdown">
+        <div class="search-container js-search-container" id="search-container">
+            <input type="text" class="search-input js-search-input" id="search-input" placeholder="Search" autocomplete="off">
+            <ul class="dropdown-menu js-search-dropdown" id="search-dropdown">
                 <li>Option 1</li>
                 <li>Option 2</li>
                 <li>Option 3</li>
