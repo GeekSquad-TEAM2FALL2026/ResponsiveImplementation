@@ -302,6 +302,8 @@ function initializeScripts() {
                 <span class="price">$${listing.price}</span>
                 <h2 class="item-title">${listing.title}</h2>
                 <span class="item-location">${listing.location}</span>
+                <span style="display: none;" class="search-category">${listing.category || ''}</span>
+                <span style="display: none;" class="search-tags">${listing.subcategory || ''} ${listing.tags || ''}</span>
             </div>
         `;
             itemListingsContainer.prepend(li);
@@ -451,6 +453,49 @@ function initializeScripts() {
         const urlParams = new URLSearchParams(window.location.search);
         const editId = urlParams.get('edit');
 
+        const categorySelect = document.getElementById('category');
+        const subcategorySelect = document.getElementById('subcategory');
+
+        const subcategoriesMap = {
+            'for-sale': [
+                { value: 'musical-instruments', label: 'Musical Instruments' },
+                { value: 'electronics', label: 'Electronics' },
+                { value: 'furniture', label: 'Furniture' },
+                { value: 'tools', label: 'Tools' },
+                { value: 'clothing', label: 'Clothing' },
+                { value: 'toys', label: 'Toys' },
+                { value: 'sports', label: 'Sports' },
+                { value: 'automotive', label: 'Automotive' },
+                { value: 'books', label: 'Books' },
+                { value: 'movies', label: 'Movies' },
+                { value: 'music', label: 'Music' },
+                { value: 'other', label: 'Other' }
+            ]
+        };
+
+        if (categorySelect && subcategorySelect) {
+            categorySelect.addEventListener('change', function () {
+                const selectedCat = this.value;
+                subcategorySelect.innerHTML = '<option value="">Select a subcategory...</option>';
+
+                if (subcategoriesMap[selectedCat]) {
+                    subcategoriesMap[selectedCat].forEach(sub => {
+                        const opt = document.createElement('option');
+                        opt.value = sub.value;
+                        opt.textContent = sub.label;
+                        subcategorySelect.appendChild(opt);
+                    });
+                    subcategorySelect.disabled = false;
+                } else {
+                    const opt = document.createElement('option');
+                    opt.value = 'other';
+                    opt.textContent = 'Other';
+                    opt.selected = true;
+                    subcategorySelect.appendChild(opt);
+                }
+            });
+        }
+
         let currentImagesBase64 = []; 
         const photoContainer = document.getElementById('image-preview-container');
         const uploadTriggerBox = document.getElementById('upload-trigger-box');
@@ -536,6 +581,7 @@ function initializeScripts() {
                 document.querySelector('.listing-page h1').textContent = 'Edit Listing';
                 document.getElementById('listing-title').value = listingToEdit.title;
                 document.getElementById('category').value = listingToEdit.category;
+                if (document.getElementById('subcategory')) document.getElementById('subcategory').value = listingToEdit.subcategory || '';
                 document.getElementById('price').value = listingToEdit.price;
                 document.getElementById('location').value = listingToEdit.location;
                 if (document.getElementById('tags')) document.getElementById('tags').value = listingToEdit.tags || '';
@@ -566,9 +612,10 @@ function initializeScripts() {
                 id: editId ? editId : Date.now().toString(),
                 title: document.getElementById('listing-title').value,
                 category: document.getElementById('category').value,
+                subcategory: document.getElementById('subcategory').value,
                 price: document.getElementById('price').value,
                 location: document.getElementById('location').value,
-                tags: document.getElementById('tags').value, // NEW: Capture tags
+                tags: document.getElementById('tags').value, 
                 description: document.getElementById('description').value,
                 images: currentImagesBase64.length > 0 ? currentImagesBase64 : ['images/placeholderImage.png']
             };
@@ -623,6 +670,33 @@ function initializeScripts() {
             if (listing) {
                 document.title = `$${listing.price} ${listing.title} - Craigslist`;
 
+                const breadcrumbCategory = document.getElementById('breadcrumb-category');
+                const breadcrumbSub = document.getElementById('breadcrumb-subcategory');
+                const breadcrumbSep = document.getElementById('breadcrumb-separator');
+                
+                if (breadcrumbCategory && listing.category) {
+                    const formattedCat = listing.category.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                    breadcrumbCategory.textContent = formattedCat;
+                    breadcrumbCategory.href = `searchResultsPage.html?q=${listing.category}`;
+                }
+                
+                if (breadcrumbSub && breadcrumbSep) {
+                    if (listing.subcategory) {
+                        // Format raw values like "musical-instruments" into "Musical Instruments"
+                        const formattedSub = listing.subcategory.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                        breadcrumbSub.textContent = formattedSub;
+                        breadcrumbSub.href = `searchResultsPage.html?q=${listing.subcategory}`;
+                        
+                        breadcrumbSub.style.display = 'inline';
+                        breadcrumbSep.style.display = 'inline';
+                    } else {
+                        // Hide the subcategory and the arrow if the user didn't choose one
+                        breadcrumbSub.style.display = 'none';
+                        breadcrumbSep.style.display = 'none';
+                    }
+                }
+
+
                 const mobileTitle = document.querySelector('.listing-title-mobile');
                 if (mobileTitle) mobileTitle.textContent = `$${listing.price} ${listing.title}`;
 
@@ -661,7 +735,9 @@ function initializeScripts() {
                 const galleryDots = document.getElementById('gallery-dots');
                 if (galleryDots) galleryDots.style.display = 'none';
 
-                if (localStorage.getItem('isLoggedIn') === 'true') {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                
+                if (currentUser) {
                     const authorActions = document.createElement('div');
                     authorActions.style.display = 'flex';
                     authorActions.style.alignItems = 'center';
