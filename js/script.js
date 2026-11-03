@@ -91,22 +91,79 @@ function initializeScripts() {
             catArrow.textContent = categoriesDropdown.classList.contains('active') ? '▲' : '▼';
         });
     }
-
+    
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     const accountLinks = Array.from(document.querySelectorAll('.nav-menu a')).filter(a => a.textContent.includes('Account'));
     
     accountLinks.forEach(link => {
-        link.href = '#'; 
-        link.textContent = localStorage.getItem('isLoggedIn') === 'true' ? 'Account (Log Out)' : 'Account (Log In)';
-        
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
-            localStorage.setItem('isLoggedIn', !loggedIn);
-            
-            alert(!loggedIn ? 'Logged in as Demo User!' : 'Logged out successfully.');
-            window.location.reload();
-        });
+        link.href = 'account.html'; 
+        link.textContent = currentUser ? `Account (${currentUser.username})` : 'Log In / Sign Up';
     });
+
+    // Account Page Logic
+    if (window.location.pathname.includes('account.html')) {
+        const authSection = document.getElementById('auth-section');
+        const dashboardSection = document.getElementById('dashboard-section');
+        const authForm = document.getElementById('auth-form');
+        const toggleAuth = document.getElementById('toggle-auth');
+        const authTitle = document.getElementById('auth-title');
+        const authMessage = document.getElementById('auth-message');
+        const logoutBtn = document.getElementById('logout-btn');
+        
+        let isLoginMode = true;
+
+        if (currentUser) {
+            authSection.style.display = 'none';
+            dashboardSection.style.display = 'block';
+            document.getElementById('display-username').textContent = currentUser.username;
+        }
+
+        if (toggleAuth) {
+            toggleAuth.addEventListener('click', (e) => {
+                e.preventDefault();
+                isLoginMode = !isLoginMode;
+                authTitle.textContent = isLoginMode ? 'Log In' : 'Sign Up';
+                toggleAuth.textContent = isLoginMode ? 'Need an account? Sign up' : 'Already have an account? Log in';
+                authMessage.textContent = '';
+            });
+        }
+
+        if (authForm) {
+            authForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value.trim();
+                let users = JSON.parse(localStorage.getItem('users') || '[]');
+
+                if (isLoginMode) {
+                    const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
+                    if (user) {
+                        localStorage.setItem('currentUser', JSON.stringify(user));
+                        window.location.reload();
+                    } else {
+                        authMessage.textContent = 'Invalid username or password.';
+                    }
+                } else {
+                    if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
+                        authMessage.textContent = 'Username already exists.';
+                    } else {
+                        const newUser = { username, password }; 
+                        users.push(newUser);
+                        localStorage.setItem('users', JSON.stringify(users));
+                        localStorage.setItem('currentUser', JSON.stringify(newUser));
+                        window.location.reload();
+                    }
+                }
+            });
+        }
+
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                localStorage.removeItem('currentUser');
+                window.location.reload();
+            });
+        }
+    }
 
     // Interactive Search Logic
     const searchContainers = document.querySelectorAll('.js-search-container, #search-container');

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account - Craigslist</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/form.css">
+</head>
+<body>
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
+    <div data-include="components/header.html"></div>
+
+    <main class="listing-page" style="max-width: 400px; margin-top: 60px;">
+        
+        <div id="auth-section">
+            <h1 id="auth-title" style="text-align: center;">Log In</h1>
+            <form id="auth-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <div class="form-actions" style="flex-direction: column; gap: 15px; margin-top: 10px;">
+                    <button type="submit" class="post-btn" style="width: 100%;">Submit</button>
+                    <a href="#" id="toggle-auth" style="color: var(--logo-color); font-weight: bold; text-decoration: none; text-align: center;">Need an account? Sign up</a>
+                </div>
+                <p id="auth-message" style="color: #ff4444; margin-top: 15px; text-align: center; font-weight: bold;"></p>
+            </form>
+        </div>
+
+        <div id="dashboard-section" style="display: none; text-align: center;">
+            <h1 style="margin-bottom: 10px;">Welcome, <span id="display-username" style="color: var(--logo-color);"></span>!</h1>
+            <p style="margin-bottom: 30px;">You are currently logged in.</p>
+            <div class="form-actions" style="justify-content: center; gap: 20px;">
+                <a href="index.html" class="post-btn" style="text-decoration: none;">Return Home</a>
+                <button id="logout-btn" class="cancel-btn">Log Out</button>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="js/HTMLInclude.min.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
