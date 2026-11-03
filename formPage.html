@@ -78,18 +78,17 @@
             </div>
 
             <!-- Add Photos -->
-            <div class="form-group">
-                <label for="photos">Add Photos</label>
+            <div class="form-group"> 
+                <label for="photos" style="width: 100%; text-align: left;">Add Photos (Max 10)</label>
 
-                <div class="photo-container">
-                    <label for="photos" class="photo-box">+</label>
-                    <label for="photos" class="photo-box">+</label>
-                    <label for="photos" class="photo-box">+</label>
+                <div class="photo-container" id="image-preview-container" style="display: flex; gap: 12px; flex-wrap: wrap; width: 100%;">
+                    
+                    <label for="photos" class="photo-box" id="upload-trigger-box">+</label>
+                    
                 </div>
 
-                <input type="file" id="photos"
-                    accept="image/*" multiple hidden>
-                <p id="photo-message"></p>
+                <input type="file" id="photos" accept="image/*" multiple hidden>
+                <p id="photo-message" style="width: 100%; text-align: left; color: #ff4444; margin-top: 4px; font-weight: bold;"></p>
             </div>
 
             <!-- Buttons -->

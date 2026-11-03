@@ -239,7 +239,7 @@ function initializeScripts() {
 
             li.innerHTML = `
             <div class="item-image-wrapper">
-                <img src="${listing.image}" alt="${listing.title}">
+                <img src="${listing.images ? listing.images[0] : listing.image}" alt="${listing.title}">
             </div>
             <div class="item-details">
                 <span class="price">$${listing.price}</span>
@@ -394,7 +394,68 @@ function initializeScripts() {
         const urlParams = new URLSearchParams(window.location.search);
         const editId = urlParams.get('edit');
 
-        let currentImageBase64 = 'images/placeholderImage.png';
+        let currentImagesBase64 = []; 
+        const photoContainer = document.getElementById('image-preview-container');
+        const uploadTriggerBox = document.getElementById('upload-trigger-box');
+        const photoMessage = document.getElementById('photo-message');
+
+        function renderImagePreviews() {
+            if (!photoContainer || !uploadTriggerBox) return;
+            
+            const existingPreviews = photoContainer.querySelectorAll('.preview-box');
+            existingPreviews.forEach(box => box.remove());
+
+            currentImagesBase64.forEach((base64, index) => {
+                const previewBox = document.createElement('div');
+                previewBox.className = 'photo-box preview-box';
+                previewBox.style.border = 'none';
+                previewBox.style.position = 'relative';
+                
+                previewBox.innerHTML = `
+                    <img src="${base64}" style="width:100%; height:100%; object-fit:cover; border-radius:6px;">
+                    <button type="button" class="remove-img-btn" data-index="${index}" aria-label="Remove image">✖</button>
+                `;
+                
+                previewBox.querySelector('.remove-img-btn').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    currentImagesBase64.splice(index, 1);
+                    renderImagePreviews();
+                });
+
+                photoContainer.insertBefore(previewBox, uploadTriggerBox);
+            });
+
+            uploadTriggerBox.style.display = currentImagesBase64.length >= 10 ? 'none' : 'flex';
+        }
+
+        if (photoInput) {
+            photoInput.addEventListener('change', function (e) {
+                const files = Array.from(e.target.files);
+                if (photoMessage) photoMessage.textContent = '';
+
+                const availableSlots = 10 - currentImagesBase64.length;
+                
+                if (files.length > availableSlots) {
+                    if (photoMessage) photoMessage.textContent = `You can only add ${availableSlots} more image(s).`;
+                }
+
+                const filesToProcess = files.slice(0, availableSlots);
+                
+                filesToProcess.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        currentImagesBase64.push(event.target.result);
+                        renderImagePreviews(); // Re-render to show new image
+                    };
+                    reader.readAsDataURL(file);
+                });
+                
+                // Clear input so same file can be chosen again if needed
+                photoInput.value = ''; 
+            });
+        }
+
+
 
         // Auto-format price with commas
         const priceInput = document.getElementById('price');
@@ -413,7 +474,7 @@ function initializeScripts() {
         if (editId) {
             const userListings = JSON.parse(localStorage.getItem('userListings') || '[]');
             const listingToEdit = userListings.find(l => l.id === editId);
-
+            
             if (listingToEdit) {
                 document.querySelector('.listing-page h1').textContent = 'Edit Listing';
                 document.getElementById('listing-title').value = listingToEdit.title;
@@ -422,29 +483,21 @@ function initializeScripts() {
                 document.getElementById('location').value = listingToEdit.location;
                 if (document.getElementById('tags')) document.getElementById('tags').value = listingToEdit.tags || '';
                 document.getElementById('description').value = listingToEdit.description;
-
-                currentImageBase64 = listingToEdit.image;
-                photoBoxes[0].innerHTML = `<img src="${currentImageBase64}" style="width:100%; height:100%; object-fit:cover; border-radius:6px;">`;
-                photoBoxes[0].style.border = 'none';
+                
+                // Moved safely inside the null check
+                if (listingToEdit.images && Array.isArray(listingToEdit.images)) {
+                    currentImagesBase64 = [...listingToEdit.images];
+                } else if (listingToEdit.image) {
+                    currentImagesBase64 = [listingToEdit.image];
+                }
+                
+                currentImagesBase64 = currentImagesBase64.filter(img => img !== 'images/placeholderImage.png');
+                
+                renderImagePreviews();
                 postButton.textContent = 'Update Listing';
             }
         }
 
-        // Handle Image Upload & Preview
-        if (photoInput) {
-            photoInput.addEventListener('change', function (e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function (event) {
-                        currentImageBase64 = event.target.result;
-                        photoBoxes[0].innerHTML = `<img src="${currentImageBase64}" style="width:100%; height:100%; object-fit:cover; border-radius:6px;">`;
-                        photoBoxes[0].style.border = 'none';
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        }
 
         listingForm.addEventListener('submit', (event) => {
             event.preventDefault();
@@ -460,7 +513,7 @@ function initializeScripts() {
                 location: document.getElementById('location').value,
                 tags: document.getElementById('tags').value, // NEW: Capture tags
                 description: document.getElementById('description').value,
-                image: currentImageBase64
+                images: currentImagesBase64.length > 0 ? currentImagesBase64 : ['images/placeholderImage.png']
             };
 
             showLoadingState(editId ? 'Updating listing...' : 'Posting your listing...', () => {
@@ -483,9 +536,8 @@ function initializeScripts() {
                     formMessage.textContent = 'Your listing has been posted!';
 
                     listingForm.reset();
-                    currentImageBase64 = 'images/placeholderImage.png';
-                    photoBoxes[0].innerHTML = '+';
-                    photoBoxes[0].style.border = '1px solid var(--text-color)';
+                    currentImagesBase64 = []; // Reset the array
+                    renderImagePreviews();    // Clear the visual preview boxes
                 }
             
             
@@ -522,7 +574,7 @@ function initializeScripts() {
 
                 const mainImage = document.getElementById('main-listing-image');
                 if (mainImage) {
-                    mainImage.src = listing.image;
+                    mainImage.src = listing.images ? listing.images[0] : listing.image;
                     mainImage.alt = listing.title;
                 }
 
@@ -612,54 +664,3 @@ setTimeout(() => {
         }
     }
 }, 3000);
-
-
-// Create Listing Loading State
-
-function setupListingForm() {
-    const listingForm = document.getElementById('listing-form');
-
-    // Only run on the Create Listing page
-    if (!listingForm) return;
-
-    // Stop the form from being set up twice
-    if (listingForm.dataset.loadingSetup === 'true') return;
-
-    const postButton = listingForm.querySelector('.post-btn');
-    const formMessage = document.getElementById('form-message');
-
-    if (!postButton || !formMessage) return;
-
-    listingForm.dataset.loadingSetup = 'true';
-
-    listingForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-
-        // Prevent repeated submissions
-        if (postButton.disabled || loadingNow) return;
-
-        // Disable button while posting
-        postButton.disabled = true;
-        postButton.textContent = 'Posting...';
-        formMessage.textContent = '';
-
-        // Show spinner and then confirmation
-        showLoadingState('Posting your listing...', () => {
-
-            // Enable button again
-            postButton.disabled = false;
-            postButton.textContent = 'Post Listing';
-
-            // Show success message
-            formMessage.textContent =
-                'Your listing has been posted!';
-        });
-    });
-}
-
-// Set up the form when the page loads
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', setupListingForm);
-} else {
-    setupListingForm();
-}
