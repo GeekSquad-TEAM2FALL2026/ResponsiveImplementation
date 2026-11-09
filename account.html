@@ -15,7 +15,7 @@
     </script>
     <div data-include="components/header.html"></div>
 
-    <main class="listing-page" style="max-width: 400px; margin-top: 60px;">
+    <main class="listing-page account-page">
         
         <div id="auth-section">
             <h1 id="auth-title" style="text-align: center;">Log In</h1>
@@ -36,14 +36,116 @@
             </form>
         </div>
 
-        <div id="dashboard-section" style="display: none; text-align: center;">
-            <h1 style="margin-bottom: 10px;">Welcome, <span id="display-username" style="color: var(--logo-color);"></span>!</h1>
-            <p style="margin-bottom: 30px;">You are currently logged in.</p>
-            <div class="form-actions" style="justify-content: center; gap: 20px;">
-                <a href="index.html" class="post-btn" style="text-decoration: none;">Return Home</a>
-                <button id="logout-btn" class="cancel-btn">Log Out</button>
-            </div>
+<!-- Account Dashboard -->
+<div id="dashboard-section" style="display: none;">
+
+    <div class="account-heading">
+        <h1>My Account</h1>
+        <p>Welcome, <span id="display-username"></span>!</p>
+    </div>
+
+    <div class="account-layout">
+
+        <!-- Account Menu -->
+        <nav class="account-menu" aria-label="Account menu">
+            <button type="button" class="account-tab active"
+                data-panel="listings-panel">My Listings</button>
+
+            <button type="button" class="account-tab"
+                data-panel="favorites-panel">Favorites</button>
+
+            <button type="button" class="account-tab"
+                data-panel="details-panel">Account Details</button>
+
+            <button type="button" class="account-tab"
+                data-panel="settings-panel">Settings</button>
+
+            <a href="formPage.html" class="account-link">
+                + Create Listing
+            </a>
+
+            <button type="button" id="logout-btn"
+                class="account-tab">Log Out</button>
+        </nav>
+
+        <!-- Right Side of the Account Page -->
+        <div class="account-content">
+
+            <!-- My Listings -->
+            <section id="listings-panel" class="account-panel">
+                <h2>My Listings</h2>
+                <p>View the items you have posted.</p>
+                <div id="my-listings"></div>
+            </section>
+
+            <!-- Favorites -->
+            <section id="favorites-panel" class="account-panel" hidden>
+                <h2>Favorites</h2>
+                <p>Items you have saved for later.</p>
+                <div id="my-favorites"></div>
+            </section>
+
+            <!-- Account Details -->
+            <section id="details-panel" class="account-panel" hidden>
+                <h2>Account Details</h2>
+                <p>Update your account information below.</p>
+
+                <!-- We check these fields with JavaScript -->
+                <form id="account-details-form" novalidate>
+
+                    <div class="form-group">
+                        <label for="profile-name">Full Name *</label>
+                        <input type="text" id="profile-name"
+                            placeholder="Enter your full name"
+                            aria-describedby="profile-name-feedback"
+                            required>
+                        <p id="profile-name-feedback"
+                            class="account-feedback"></p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="profile-email">Email *</label>
+                        <input type="email" id="profile-email"
+                            placeholder="name@example.com"
+                            aria-describedby="profile-email-feedback"
+                            required>
+                        <p id="profile-email-feedback"
+                            class="account-feedback"></p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="profile-phone">Phone Number *</label>
+                        <input type="tel" id="profile-phone"
+                            placeholder="555-123-4567"
+                            aria-describedby="profile-phone-feedback"
+                            required>
+                        <p id="profile-phone-feedback"
+                            class="account-feedback"></p>
+                    </div>
+
+                    <button type="submit" class="post-btn">
+                        Save Changes
+                    </button>
+
+                    <p id="details-message" role="status"></p>
+                </form>
+            </section>
+
+            <!-- Settings -->
+            <section id="settings-panel" class="account-panel" hidden>
+                <h2>Settings</h2>
+                <p>Change how the website looks.</p>
+
+                <label class="account-setting-label">
+                    <input type="checkbox" id="account-dark-mode">
+                    Enable Dark Mode
+                </label>
+            </section>
+
         </div>
+    </div>
+</div>
+
 
     </main>
 

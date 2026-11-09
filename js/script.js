@@ -435,12 +435,70 @@ function initializeScripts() {
         if (replyDesktop) replyDesktop.addEventListener('click', toggleReplyPanel);
     }
 
-    if (saveBtn) {
-        saveBtn.addEventListener('click', () => {
-            const saved = saveBtn.classList.toggle('saved');
-            saveBtn.textContent = saved ? 'Saved' : 'Save';
+    
+// Save and remove favorite listings
+if (saveBtn) {
+    const favoriteId =
+        new URLSearchParams(window.location.search).get('id')
+        || 'moog-theremin';
+
+    if (currentUser) {
+        const key = 'favorites_' + currentUser.username.toLowerCase();
+
+        const savedItems = JSON.parse(
+            localStorage.getItem(key) || '[]'
+        );
+
+        // Check if this listing was already saved
+        const alreadySaved = savedItems.some(item => {
+            return item.id === favoriteId;
         });
+
+        saveBtn.classList.toggle('saved', alreadySaved);
+        saveBtn.textContent = alreadySaved ? 'Saved' : 'Save';
     }
+
+    saveBtn.addEventListener('click', () => {
+        // Have the user log in first
+        if (!currentUser) {
+            window.location.href = 'account.html';
+            return;
+        }
+
+        const key = 'favorites_' + currentUser.username.toLowerCase();
+
+        let savedItems = JSON.parse(
+            localStorage.getItem(key) || '[]'
+        );
+
+        const alreadySaved = savedItems.some(item => {
+            return item.id === favoriteId;
+        });
+
+        if (alreadySaved) {
+            // Remove from favorites
+            savedItems = savedItems.filter(item => {
+                return item.id !== favoriteId;
+            });
+        } else {
+            // Get the listing title and save it
+            const title = document.querySelector(
+                '.listing-title-desktop'
+            ).textContent;
+
+            savedItems.push({
+                id: favoriteId,
+                title: title
+            });
+        }
+
+        localStorage.setItem(key, JSON.stringify(savedItems));
+
+        saveBtn.classList.toggle('saved', !alreadySaved);
+        saveBtn.textContent = alreadySaved ? 'Save' : 'Saved';
+    });
+}
+
 
     // Create / Edit Listing Logic
     const listingForm = document.getElementById('listing-form');
@@ -610,6 +668,7 @@ function initializeScripts() {
 
             const newListing = {
                 id: editId ? editId : Date.now().toString(),
+                owner: currentUser ? currentUser.username : '',
                 title: document.getElementById('listing-title').value,
                 category: document.getElementById('category').value,
                 subcategory: document.getElementById('subcategory').value,
@@ -797,3 +856,268 @@ setTimeout(() => {
         }
     }
 }, 3000);
+
+
+// Account sections (listings, favorites, and details)
+function setupAccountDashboard() {
+    const dashboard = document.getElementById('dashboard-section');
+    if (!dashboard) return; // Only runs on account.html
+
+    const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    if (!user) return; // User needs to log in first
+
+    const tabs = document.querySelectorAll('.account-tab');
+    const panels = document.querySelectorAll('.account-panel');
+
+    // Switch between account sections
+    function showPanel(panelId) {
+        tabs.forEach(tab => {
+            tab.classList.toggle(
+                'active',
+                tab.dataset.panel === panelId
+            );
+        });
+
+        panels.forEach(panel => {
+            panel.hidden = panel.id !== panelId;
+        });
+
+        if (panelId === 'settings-panel') {
+            darkSetting.checked =
+                document.body.classList.contains('dark-mode');
+        }
+    }
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            showPanel(tab.dataset.panel);
+        });
+    });
+
+    // Allow links directly to a section
+    const section = window.location.hash.substring(1);
+    const allowed = [
+        'listings-panel',
+        'favorites-panel',
+        'details-panel',
+        'settings-panel'
+    ];
+
+    // Settings toggle
+    const darkSetting = document.getElementById('account-dark-mode');
+
+    darkSetting.addEventListener('change', () => {
+        const isDark = darkSetting.checked;
+
+        document.body.classList.toggle('dark-mode', isDark);
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+
+        // Keep the header toggle matching
+        const headerToggle = document.getElementById('theme-switch');
+        if (headerToggle) headerToggle.checked = isDark;
+    });
+
+    showPanel(allowed.includes(section) ? section : 'listings-panel');
+
+    // My Listings
+    const myListings = document.getElementById('my-listings');
+    const listings = JSON.parse(
+        localStorage.getItem('userListings') || '[]'
+    );
+
+    const ownedListings = listings.filter(item => {
+        return item.owner === user.username;
+    });
+
+    myListings.replaceChildren();
+
+    if (ownedListings.length === 0) {
+        myListings.textContent = 'You have not posted any listings yet.';
+    } else {
+        ownedListings.forEach(item => {
+            const row = document.createElement('div');
+            row.className = 'account-item';
+
+            const title = document.createElement('strong');
+            title.textContent = item.title;
+
+            const info = document.createElement('p');
+            info.textContent = '$' + item.price + ' • ' + item.location;
+
+            const view = document.createElement('a');
+            view.href = 'listing.html?id=' + encodeURIComponent(item.id);
+            view.textContent = 'View Listing';
+
+            row.append(title, info, view);
+            myListings.appendChild(row);
+        });
+    }
+
+    // Favorites
+    const favoritesBox = document.getElementById('my-favorites');
+    const favoritesKey = 'favorites_' + user.username.toLowerCase();
+
+    function showFavorites() {
+        const saved = JSON.parse(
+            localStorage.getItem(favoritesKey) || '[]'
+        );
+
+        favoritesBox.replaceChildren();
+
+        if (saved.length === 0) {
+            favoritesBox.textContent =
+                'No favorites yet. Save an item to see it here.';
+            return;
+        }
+
+        saved.forEach(item => {
+            const row = document.createElement('div');
+            row.className = 'account-item';
+
+            const title = document.createElement('strong');
+            title.textContent = item.title;
+
+            const view = document.createElement('a');
+            view.href = item.id === 'moog-theremin'
+                ? 'listing.html'
+                : 'listing.html?id=' + encodeURIComponent(item.id);
+            view.textContent = 'View';
+
+            const remove = document.createElement('button');
+            remove.type = 'button';
+            remove.className = 'account-remove';
+            remove.textContent = 'Remove';
+
+            remove.addEventListener('click', () => {
+                const updated = saved.filter(savedItem => {
+                    return savedItem.id !== item.id;
+                });
+
+                localStorage.setItem(
+                    favoritesKey,
+                    JSON.stringify(updated)
+                );
+
+                showFavorites();
+            });
+
+            row.append(title, view, remove);
+            favoritesBox.appendChild(row);
+        });
+    }
+
+    showFavorites();
+
+    // Account Details Validation
+    const detailsForm = document.getElementById('account-details-form');
+    const nameField = document.getElementById('profile-name');
+    const emailField = document.getElementById('profile-email');
+    const phoneField = document.getElementById('profile-phone');
+    const message = document.getElementById('details-message');
+
+    const fields = [nameField, emailField, phoneField];
+
+    // Fill in saved information if it exists
+    nameField.value = user.fullName || '';
+    emailField.value = user.email || '';
+    phoneField.value = user.phone || '';
+
+    // Check each field
+    function checkField(field) {
+        const value = field.value.trim();
+        let error = '';
+
+        if (field === nameField) {
+            if (!value) {
+                error = 'Please enter your full name.';
+            } else if (value.length < 2) {
+                error = 'Name must be at least 2 characters.';
+            }
+        }
+
+        if (field === emailField) {
+            if (!value) {
+                error = 'Please enter your email.';
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                error = 'Enter an email like name@example.com.';
+            }
+        }
+
+        if (field === phoneField) {
+            const digits = value.replace(/\D/g, '');
+
+            if (!value) {
+                error = 'Please enter your phone number.';
+            } else if (digits.length !== 10) {
+                error = 'Enter a 10-digit phone number.';
+            }
+        }
+
+        // Put the message under the correct field
+        const feedback = document.getElementById(
+            field.id + '-feedback'
+        );
+
+        feedback.textContent = error || 'Looks good!';
+        feedback.className = 'account-feedback ' +
+            (error ? 'error' : 'success');
+
+        field.classList.toggle('invalid', !!error);
+        field.classList.toggle('valid', !error);
+        field.setAttribute('aria-invalid', String(!!error));
+
+        return !error;
+    }
+
+    // Validate when typing or leaving a field
+    fields.forEach(field => {
+        field.addEventListener('input', () => checkField(field));
+        field.addEventListener('blur', () => checkField(field));
+    });
+
+    // Save account information
+    detailsForm.addEventListener('submit', event => {
+        event.preventDefault();
+
+        const results = fields.map(field => checkField(field));
+
+        if (!results.every(Boolean)) {
+            message.textContent = 'Please fix the highlighted fields.';
+            return;
+        }
+
+        // Save information for our class prototype
+        const updatedUser = {
+            ...user,
+            fullName: nameField.value.trim(),
+            email: emailField.value.trim(),
+            phone: phoneField.value.trim()
+        };
+
+        localStorage.setItem(
+            'currentUser',
+            JSON.stringify(updatedUser)
+        );
+
+        // Update the saved demo user too
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const index = users.findIndex(item => {
+            return item.username === user.username;
+        });
+
+        if (index !== -1) {
+            users[index] = { ...users[index], ...updatedUser };
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
+        message.textContent = 'Account details saved!';
+    });
+}
+
+// Run the account code after the page loads
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupAccountDashboard);
+} else {
+    setupAccountDashboard();
+}
+

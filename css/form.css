@@ -269,3 +269,192 @@
         height: 75px;
     }
 }
+
+
+/* Account Dashboard */
+
+.account-page {
+    max-width: 1000px;
+    width: calc(100% - 32px);
+    margin: 35px auto;
+}
+
+/* Keep the login form smaller */
+#auth-section {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.account-heading {
+    margin-bottom: 25px;
+}
+
+.account-heading p {
+    margin-top: 8px;
+}
+
+/* Account menu on the left */
+.account-layout {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 25px;
+}
+
+.account-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.account-tab,
+.account-link {
+    width: 100%;
+    padding: 15px;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    border: none;
+    border-radius: 8px;
+    text-align: left;
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.account-tab:hover,
+.account-link:hover,
+.account-tab.active {
+    background-color: var(--highlight);
+}
+
+/* Content area */
+.account-content {
+    min-width: 0;
+}
+
+.account-panel {
+    background-color: var(--secondary-color);
+    border-radius: 8px;
+    padding: 25px;
+}
+
+.account-panel[hidden] {
+    display: none;
+}
+
+.account-panel h2 {
+    margin-bottom: 10px;
+}
+
+.account-panel > p {
+    margin-bottom: 20px;
+}
+
+/* Listings and favorites */
+.account-item {
+    background-color: var(--background-color);
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 12px;
+}
+
+.account-item p {
+    margin: 8px 0;
+}
+
+.account-item a {
+    color: var(--logo-color);
+    font-weight: bold;
+}
+
+.account-remove {
+    margin-left: 15px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    background-color: var(--image-placehold);
+    color: white;
+    cursor: pointer;
+}
+
+/* Account Details Form */
+
+#account-details-form {
+    margin-top: 20px;
+}
+
+#account-details-form input {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: 2px solid transparent;
+    border-radius: 6px;
+}
+
+/* Error state */
+#account-details-form input.invalid {
+    border-color: #D93025;
+}
+
+/* Correct input state */
+#account-details-form input.valid {
+    border-color: #188038;
+}
+
+/* Messages below each field */
+.account-feedback {
+    font-size: 14px;
+    min-height: 18px;
+}
+
+.account-feedback.error {
+    color: #B42318;
+}
+
+.account-feedback.success {
+    color: #166534;
+}
+
+body.dark-mode .account-feedback.error {
+    color: #FF9999;
+}
+
+body.dark-mode .account-feedback.success {
+    color: #86EFAC;
+}
+
+#details-message {
+    margin-top: 15px;
+    font-weight: bold;
+    color: var(--logo-color);
+}
+
+.account-setting-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Mobile layout */
+@media (max-width: 767px) {
+    .account-layout {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .account-menu {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .account-tab,
+    .account-link {
+        font-size: 14px;
+        padding: 12px;
+    }
+
+    .account-panel {
+        padding: 18px;
+    }
+}
+
