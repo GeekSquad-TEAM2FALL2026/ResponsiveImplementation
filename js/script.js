@@ -109,6 +109,20 @@ function initializeScripts() {
         const authTitle = document.getElementById('auth-title');
         const authMessage = document.getElementById('auth-message');
         const logoutBtn = document.getElementById('logout-btn');
+
+        // Field collections
+        const loginFields = document.querySelectorAll('.login-only');
+        const signupFields = document.querySelectorAll('.signup-only');
+
+        // Login inputs
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+
+        // Signup inputs
+        const signupUsernameInput = document.getElementById('signup-username');
+        const signupPasswordInput = document.getElementById('signup-password');
+        const signupConfirmPasswordInput = document.getElementById('signup-confirm-password');
+        const signupEmailInput = document.getElementById('signup-email');
         
         let isLoginMode = true;
 
