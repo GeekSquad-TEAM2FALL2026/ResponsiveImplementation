@@ -679,6 +679,41 @@ font-weight: bold;
 margin-top: 1rem;
 }
 
+/* Classic Search Autocomplete Row Styling */
+.dropdown-menu li.autocomplete-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 1.1rem;
+    border-bottom: none;
+    font-weight: 700;
+    font-size: 0.98rem;
+}
+
+.dropdown-menu li.autocomplete-row:hover,
+.dropdown-menu li.autocomplete-row.keyboard-active {
+    background-color: var(--highlight);
+}
+
+.autocomplete-icon {
+    font-size: 0.85rem;
+    opacity: 0.55;
+    flex-shrink: 0;
+}
+
+/**
+ * Styles for the text content of the autocomplete row
+ */
+.autocomplete-text {
+    color: var(--text-color);
+    font-weight: 700;
+}
+
+.autocomplete-match {
+    font-weight: 400;
+    color: var(--logo-color);
+}
+
 /* Loading State Overlay */
 .loading-overlay {
 position: fixed;

@@ -12,13 +12,78 @@ if (localStorage.getItem('theme') === 'dark') {
 })();
 
 // Product Auto-suggestions
-const PRODUCTS_SUGGESTIONS = [
-    { title: 'Moog Theremin', category: 'Musical Instruments', price: '$800', keywords: ['moog', 'theremin', 'synthesizer', 'synth', 'electronic music', 'audio equipment'] },
-    { title: 'Item 2', category: 'For Sale', price: '$50', keywords: 'description for item 2' },
-    { title: 'Item 3', category: 'For Sale', price: '$25', keywords: 'description for item 3' },
-    { title: 'Item 4', category: 'For Sale', price: '$200', keywords: 'description for item 4' },
-    { title: 'Item 5', category: 'For Sale', price: '$550', keywords: 'description for item 5' }
+const BASE_SEARCH_QUERIES = [
+    'moog theremin',
+    'moog synthesizer',
+    'musical instruments',
+    'synthesizer',
+    'electronic music',
+    'audio equipment',
+    'apartments for rent',
+    'apple macbook pro',
+    'auto parts',
+    'bicycle',
+    'bookshelf',
+    'camera lens',
+    'cars and trucks',
+    'coffee table',
+    'computer monitor',
+    'couch',
+    'desk chair',
+    'dining table',
+    'electric guitar',
+    'electronics',
+    'for sale',
+    'free stuff',
+    'furniture',
+    'gaming pc',
+    'housing',
+    'iphone',
+    'kayak',
+    'mountain bike',
+    'moving boxes',
+    'nintendo switch',
+    'office desk',
+    'patio furniture',
+    'standing desk',
+    'tools',
+    'tv stand',
+    'washer and dryer'
 ];
+// Dynamically merge base queries with user-created listings & tags from localStorage
+function getAutocompletePool() {
+    const userListings = JSON.parse(localStorage.getItem('userListings') || '[]');
+    const dynamicTerms = [];
+
+    // Pull titles, categories, subcategories, and comma-separated tags from saved listings
+    userListings.forEach(item => {
+        if (item.title) dynamicTerms.push(item.title.toLowerCase().trim());
+        if (item.category) dynamicTerms.push(item.category.replace(/-/g, ' ').toLowerCase().trim());
+        if (item.subcategory) dynamicTerms.push(item.subcategory.replace(/-/g, ' ').toLowerCase().trim());
+        if (item.tags) {
+            item.tags.split(',').forEach(tag => {
+                const cleanTag = tag.toLowerCase().trim();
+                if (cleanTag) dynamicTerms.push(cleanTag);
+            });
+        }
+    });
+    // Also pull titles from any hardcoded ".item-title" cards currently on the page
+    document.querySelectorAll('.item-title').forEach(el => {
+        const titleText = el.textContent.toLowerCase().trim();
+        if (titleText) dynamicTerms.push(titleText);
+    });
+
+    // Deduplicate and return clean list
+    return [...new Set([...dynamicTerms, ...BASE_SEARCH_QUERIES].filter(Boolean))];
+}
+
+// Highlights the characters the user typed vs. the predicted completion
+function formatAutocompleteMatch(suggestion, query) {
+    if (!query) return suggestion;
+    const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escaped})`, 'i');
+    return suggestion.replace(regex, '<span class="autocomplete-match">$1</span>');
+}
 
 // Loading State for Search and Posting
 let loadingNow = false;
@@ -222,7 +287,7 @@ function initializeScripts() {
     }
     }
 
-    // Interactive Search Logic
+    // Interactive Search Logic Classic Autocomplete
     const searchContainers = document.querySelectorAll('.js-search-container, #search-container');
     const urlParams = new URLSearchParams(window.location.search);
     const initialQuery = urlParams.get('q') || '';
@@ -245,19 +310,36 @@ function initializeScripts() {
         const query = filterText.trim().toLowerCase();
         dropdownEl.innerHTML = '';
 
-        const matches = PRODUCTS_SUGGESTIONS.filter(item => {
-            if (!query) return true;
-            const KeywordsStr = Array.isArray(item.keywords) ? item.keywords.join(' ') : item.keywords;
-            return (
-                item.title.toLowerCase().includes(query) ||
-                item.category.toLowerCase().includes(query) ||
-                KeywordsStr.toLowerCase().includes(query)
-            );
-        });
+        const pool = getAutocompletePool();
+        let matches = [];
 
-        if (matches.length === 0) {
+        if (!query) {
+            matches = pool.slice(0, 5);
+        } else {
+            // Rank terms that START with the query first, followed by terms that INCLUDE the query
+            const startsWith = [];
+            const includes = [];
+
+            pool.forEach(term => {
+                if (term.startsWith(query)) {
+                    startsWith.push(term);
+                } else if (term.includes(query)) {
+                    includes.push(term);
+                }
+            });
+
+            matches = [...startsWith, ...includes].slice(0, 7);
+        }
+
+        // If no preset matches, show a fallback "Search for..." row
+        if (matches.length === 0 && query) {
             const emptyLi = document.createElement('li');
-            emptyLi.textContent = `Search all listings for "${filterText.trim()}"`;
+            emptyLi.className = 'autocomplete-row';
+            emptyLi.dataset.value = query;
+            emptyLi.innerHTML = `
+                <span class="autocomplete-icon" aria-hidden="true">🔍</span>
+                <span class="autocomplete-text"><span class="autocomplete-match">${filterText.trim()}</span></span>
+            `;
             emptyLi.addEventListener('click', () => {
                 dropdownEl.classList.remove('active');
                 executeProductSearch(filterText);
@@ -266,20 +348,19 @@ function initializeScripts() {
             return;
         }
 
-        matches.forEach(item => {
+        matches.forEach((term, index) => {
             const li = document.createElement('li');
+            li.className = 'autocomplete-row';
+            li.dataset.index = index;
+            li.dataset.value = term;
             li.innerHTML = `
-                <div class="dropdown-item-row">
-                    <div class="dropdown-item-main">
-                        <span>${item.title}</span>
-                        <span class="dropdown-item-category">in ${item.category}</span>
-                    </div>
-                </div>
+                <span class="autocomplete-icon" aria-hidden="true">🔍</span>
+                <span class="autocomplete-text">${formatAutocompleteMatch(term, query)}</span>
             `;
             li.addEventListener('click', () => {
-                inputEl.value = item.title;
+                inputEl.value = term;
                 dropdownEl.classList.remove('active');
-                executeProductSearch(item.title);
+                executeProductSearch(term);
             });
             dropdownEl.appendChild(li);
         });
@@ -290,9 +371,12 @@ function initializeScripts() {
         const dropdownEl = container.querySelector('.js-search-dropdown, #search-dropdown');
         if (!inputEl || !dropdownEl) return;
 
+        let activeIndex = -1;
+
         if (initialQuery) inputEl.value = initialQuery;
 
         inputEl.addEventListener('focus', () => {
+            activeIndex = -1;
             renderDropdownSuggestions(dropdownEl, inputEl, inputEl.value);
             dropdownEl.classList.add('active');
             if (categoriesDropdown) categoriesDropdown.classList.remove('active');
@@ -300,6 +384,7 @@ function initializeScripts() {
         });
 
         inputEl.addEventListener('input', () => {
+            activeIndex = -1;
             renderDropdownSuggestions(dropdownEl, inputEl, inputEl.value);
             dropdownEl.classList.add('active');
 
@@ -309,12 +394,28 @@ function initializeScripts() {
         });
 
         inputEl.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
+            const items = dropdownEl.querySelectorAll('.autocomplete-row');
+            const isOpen = dropdownEl.classList.contains('active') && items.length > 0;
+
+            if (e.key === 'ArrowDown' && isOpen) {
                 e.preventDefault();
+                activeIndex = (activeIndex + 1) % items.length;
+                items.forEach((item, i) => item.classList.toggle('keyboard-active', i === activeIndex));
+                inputEl.value = items[activeIndex].dataset.value;
+            } else if (e.key === 'ArrowUp' && isOpen) {
+                e.preventDefault();
+                activeIndex = (activeIndex - 1 + items.length) % items.length;
+                items.forEach((item, i) => item.classList.toggle('keyboard-active', i === activeIndex));
+                inputEl.value = items[activeIndex].dataset.value;
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                const selectedValue = (isOpen && activeIndex >= 0) ? items[activeIndex].dataset.value : inputEl.value;
                 dropdownEl.classList.remove('active');
-                executeProductSearch(inputEl.value);
+                activeIndex = -1;
+                executeProductSearch(selectedValue);
             } else if (e.key === 'Escape') {
                 dropdownEl.classList.remove('active');
+                activeIndex = -1;
                 inputEl.blur();
             }
         });
@@ -390,9 +491,15 @@ function initializeScripts() {
         });
     }
 
+    // Synonym lookup for hardcoded items
+    const ITEM_SYNONYM_MAP = {
+        'moog theremin': ['moog', 'theremin', 'synthesizer', 'synth', 'electronic music', 'audio equipment', 'musical instruments', 'for sale']
+    };
+
     function filterListingsOnPage(queryText) {
         if (!itemListingsContainer) return;
         const query = queryText.trim().toLowerCase();
+        const queryWords = query.split(/\s+/).filter(Boolean);
         const items = Array.from(itemListingsContainer.querySelectorAll('.item'));
         const heading = document.querySelector('.results-page h1');
 
@@ -402,8 +509,20 @@ function initializeScripts() {
 
         let visibleCount = 0;
         items.forEach(item => {
-            const textContent = item.textContent.toLowerCase();
-            const isMatch = !query || textContent.includes(query);
+            let searchableText = item.textContent.toLowerCase();
+
+            // Automatically append synonyms if the card contains "moog theremin"
+            Object.entries(ITEM_SYNONYM_MAP).forEach(([itemKey, keywords]) => {
+                if (searchableText.includes(itemKey)) {
+                    searchableText += ' ' + keywords.join(' ');
+                }
+            });
+
+            // Check if the full phrase matches, OR if every individual word in the search query matches
+            const isMatch = !query || 
+                            searchableText.includes(query) || 
+                            (queryWords.length > 0 && queryWords.every(word => searchableText.includes(word)));
+
             item.style.display = isMatch ? '' : 'none';
             if (isMatch) visibleCount++;
         });
