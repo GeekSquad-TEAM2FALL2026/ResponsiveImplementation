@@ -773,6 +773,30 @@ animation: loadingSpin 0.8s linear infinite;
     transform: scale(1.1);
 }
 
+#upload-trigger-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px dashed var(--image-placehold); 
+    font-size: 2rem; 
+    cursor: pointer;
+}
+
+#upload-trigger-box:hover {
+    border-color: var(--logo-color);
+    color: var(--logo-color);
+}
+
+input, select, textarea {
+    border: 1px solid var(--image-placehold); 
+    border-radius: 4px;
+    outline: none; 
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--logo-color); 
+    box-shadow: 0 0 5px color-mix(in srgb, var(--logo-color) 30%, transparent); 
+}
 
 @keyframes loadingSpin {
 from { transform: rotate(0deg); }

@@ -1093,7 +1093,7 @@ if (saveBtn) {
                     
                     authorActions.innerHTML = `
                         <div style="flex: 1;"><strong>Post Options</strong></div>
-                        <button class="btn" id="listing-edit-btn" style="padding: 0.5rem 1rem; width: auto; min-width: 0; font-size: 1rem;">Edit</button>
+                        <button class="btn" id="listing-edit-btn" style="padding: 0.5rem 1rem; width: auto; min-width: 0; font-size: 1rem; border: 1px solid var(--image-placehold); background-color: var(--background-color);">Edit</button>
                         <button class="btn" id="listing-delete-btn" style="padding: 0.5rem 1rem; width: auto; min-width: 0; font-size: 1rem; background-color: #ff4444; color: white;">Delete</button>
                     `;
                     
