@@ -695,6 +695,13 @@ if (saveBtn) {
     // Create / Edit Listing Logic
     const listingForm = document.getElementById('listing-form');
     if (listingForm) {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (!currentUser) {
+            alert('You must be logged in to create or edit a listing.');
+            window.location.href = 'account.html';
+            return;
+        }
+
         const postButton = listingForm.querySelector('.post-btn');
         const formMessage = document.getElementById('form-message');
         const photoInput = document.getElementById('photos');
@@ -828,6 +835,11 @@ if (saveBtn) {
             const listingToEdit = userListings.find(l => l.id === editId);
             
             if (listingToEdit) {
+                if (listingToEdit.owner !== currentUser.username) {
+                    alert('You do not have permission to edit this listing.');
+                    window.location.href = 'index.html';
+                    return;
+                }
                 document.querySelector('.listing-page h1').textContent = 'Edit Listing';
                 document.getElementById('listing-title').value = listingToEdit.title;
                 const categoryInput = document.getElementById('category');
@@ -983,6 +995,35 @@ if (saveBtn) {
 
                 const descContainer = document.querySelector('.listing-description');
                 if (descContainer) descContainer.innerHTML = `<p>${listing.description}</p>`;
+                // --- NEW: Inject Seller Information ---
+                const replyPanelElement = document.getElementById('reply-panel');
+                if (replyPanelElement) {
+                    const allUsers = JSON.parse(localStorage.getItem('users') || '[]');
+                    // Find the user profile that matches the listing's owner
+                    const sellerProfile = allUsers.find(u => u.username === listing.owner);
+
+                    if (sellerProfile) {
+                        // Use saved account details, fallback to username or 'Not provided' if blank
+                        const sellerName = sellerProfile.fullName || sellerProfile.username;
+                        const sellerEmail = sellerProfile.email || 'Not provided';
+                        const sellerPhone = sellerProfile.phone || 'Not provided';
+
+                        replyPanelElement.innerHTML = `
+                            <h3>Contact Seller</h3>
+                            <p><strong>Name:</strong> ${sellerName}</p>
+                            <p><strong>Email:</strong> <a href="mailto:${sellerEmail}" style="color: var(--logo-color); text-decoration: none;">${sellerEmail}</a></p>
+                            <p><strong>Phone:</strong> ${sellerPhone}</p>
+                        `;
+                    } else {
+                        // Fallback for listings created before accounts were required
+                        replyPanelElement.innerHTML = `
+                            <h3>Contact Seller</h3>
+                            <p><strong>Name:</strong> Unknown Seller</p>
+                            <p><strong>Email:</strong> Not provided</p>
+                            <p><strong>Phone:</strong> Not provided</p>
+                        `;
+                    }
+                }
 
                 const thumbRow = document.getElementById('thumbnail-row');
                 const galleryDots = document.getElementById('gallery-dots');
@@ -1038,7 +1079,7 @@ if (saveBtn) {
                 }
                 const currentUser = JSON.parse(localStorage.getItem('currentUser'));
                 
-                if (currentUser) {
+                if (currentUser && currentUser.username === listing.owner) {
                     const authorActions = document.createElement('div');
                     authorActions.style.display = 'flex';
                     authorActions.style.alignItems = 'center';
