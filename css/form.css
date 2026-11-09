@@ -86,7 +86,7 @@
 .form-group input::placeholder,
 .form-group textarea::placeholder {
     color: var(--text-color);
-    opacity: 0.8;
+    opacity: 0.5;
 }
 
 .form-group textarea {
@@ -130,6 +130,7 @@
 
 .photo-box:hover {
     background-color: var(--highlight);
+   
 }
 
 /* Cancel and Post Listing Buttons */
@@ -375,6 +376,11 @@
     background-color: var(--image-placehold);
     color: white;
     cursor: pointer;
+}
+/*Login/signup pages*/
+.form-group label{
+    display: block;
+    margin-bottom: 10px;
 }
 
 /* Account Details Form */
