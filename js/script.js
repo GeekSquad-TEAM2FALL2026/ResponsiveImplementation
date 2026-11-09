@@ -126,57 +126,100 @@ function initializeScripts() {
         
         let isLoginMode = true;
 
-        if (currentUser) {
-            authSection.style.display = 'none';
-            dashboardSection.style.display = 'block';
-            document.getElementById('display-username').textContent = currentUser.username;
-        }
+        // Helper function to update input attributes and field visibility
+    function updateFormMode() {
+        loginFields.forEach(field => {
+            field.style.display = isLoginMode ? 'block' : 'none';
+        });
+        signupFields.forEach(field => {
+            field.style.display = isLoginMode ? 'none' : 'block';
+        });
 
-        if (toggleAuth) {
-            toggleAuth.addEventListener('click', (e) => {
-                e.preventDefault();
-                isLoginMode = !isLoginMode;
-                authTitle.textContent = isLoginMode ? 'Log In' : 'Sign Up';
-                toggleAuth.textContent = isLoginMode ? 'Need an account? Sign up' : 'Already have an account? Log in';
-                authMessage.textContent = '';
-            });
-        }
+        // Set required attributes dynamically so hidden inputs don't block submission
+        usernameInput.required = isLoginMode;
+        passwordInput.required = isLoginMode;
 
-        if (authForm) {
-            authForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const username = document.getElementById('username').value.trim();
-                const password = document.getElementById('password').value.trim();
-                let users = JSON.parse(localStorage.getItem('users') || '[]');
+        signupUsernameInput.required = !isLoginMode;
+        signupPasswordInput.required = !isLoginMode;
+        signupConfirmPasswordInput.required = !isLoginMode;
+        signupEmailInput.required = !isLoginMode;
+    }
 
-                if (isLoginMode) {
-                    const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
-                    if (user) {
-                        localStorage.setItem('currentUser', JSON.stringify(user));
-                        window.location.reload();
-                    } else {
-                        authMessage.textContent = 'Invalid username or password.';
-                    }
+    // Initialize initial state (Login Mode)
+    updateFormMode();
+
+    if (currentUser) {
+        authSection.style.display = 'none';
+        dashboardSection.style.display = 'block';
+        document.getElementById('display-username').textContent = currentUser.username;
+    }
+
+    if (toggleAuth) {
+        toggleAuth.addEventListener('click', (e) => {
+            e.preventDefault();
+            isLoginMode = !isLoginMode;
+
+            authTitle.textContent = isLoginMode ? 'Log In' : 'Sign Up';
+            toggleAuth.textContent = isLoginMode 
+                ? 'Need an account? Sign up' 
+                : 'Already have an account? Log in';
+            authMessage.textContent = '';
+
+            updateFormMode();
+        });
+    }
+
+    if (authForm) {
+        authForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            authMessage.textContent = '';
+            let users = JSON.parse(localStorage.getItem('users') || '[]');
+
+            if (isLoginMode) {
+                const username = usernameInput.value.trim();
+                const password = passwordInput.value.trim();
+
+                const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
+                if (user) {
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    window.location.reload();
                 } else {
-                    if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
-                        authMessage.textContent = 'Username already exists.';
-                    } else {
-                        const newUser = { username, password }; 
-                        users.push(newUser);
-                        localStorage.setItem('users', JSON.stringify(users));
-                        localStorage.setItem('currentUser', JSON.stringify(newUser));
-                        window.location.reload();
-                    }
+                    authMessage.textContent = 'Invalid username or password.';
                 }
-            });
-        }
+            } else {
+                const username = signupUsernameInput.value.trim();
+                const password = signupPasswordInput.value.trim();
+                const confirmPassword = signupConfirmPasswordInput.value.trim();
+                const email = signupEmailInput.value.trim();
 
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', () => {
-                localStorage.removeItem('currentUser');
+                // 1. Password Match Check
+                if (password !== confirmPassword) {
+                    authMessage.textContent = 'Passwords do not match.';
+                    return;
+                }
+
+                // 2. Duplicate Username Check
+                if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
+                    authMessage.textContent = 'Username already exists.';
+                    return;
+                }
+
+                // 3. Save New User
+                const newUser = { username, email, password }; 
+                users.push(newUser);
+                localStorage.setItem('users', JSON.stringify(users));
+                localStorage.setItem('currentUser', JSON.stringify(newUser));
                 window.location.reload();
-            });
-        }
+            }
+        });
+    }
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('currentUser');
+            window.location.reload();
+        });
+    }
     }
 
     // Interactive Search Logic
