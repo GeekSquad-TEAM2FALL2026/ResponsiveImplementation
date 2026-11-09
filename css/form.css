@@ -377,6 +377,11 @@
     color: white;
     cursor: pointer;
 }
+/*Login/signup pages*/
+.form-group label{
+    display: block;
+    margin-bottom: 10px;
+}
 
 /* Account Details Form */
 
