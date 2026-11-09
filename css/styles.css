@@ -332,7 +332,7 @@ letter-spacing: 1px;
 }
 
 .header-search {
-display: none;
+display: block;
 margin: 0 1rem;
 max-width: 360px;
 flex: 1;
