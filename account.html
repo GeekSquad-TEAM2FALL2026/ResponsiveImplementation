@@ -20,17 +20,35 @@
         <div id="auth-section">
             <h1 id="auth-title" style="text-align: center;">Log In</h1>
             <form id="auth-form">
-                <div class="form-group">
+                <div class="form-group login-only">
                     <label for="username">Username</label>
                     <input type="text" id="username" required>
                 </div>
-                <div class="form-group">
+                <div class="form-group login-only">
                     <label for="password">Password</label>
                     <input type="password" id="password" required>
                 </div>
+                <div class="form-group signup-only">
+                    <label for="signup-username"> Create Username</label>
+                    <input type="text" id="signup-username" required>
+                </div>
+                <div class="form-group signup-only">
+                    <label for="signup-password">Create Password</label>
+                    <input type="password" id="signup-password" required>
+                </div>
+                <div class="form-group signup-only">
+                    <label for="signup-confirm-password">Confirm Password</label>
+                    <input type="password" id="signup-confirm-password" required>
+                </div>
+                <div class="form-group signup-only">
+                    <label for="signup-email">Email</label>
+                    <input type="email" id="signup-email" required>
+                </div>
+
+
                 <div class="form-actions" style="flex-direction: column; gap: 15px; margin-top: 10px;">
                     <button type="submit" class="post-btn" style="width: 100%;">Submit</button>
-                    <a href="#" id="toggle-auth" style="color: var(--logo-color); font-weight: bold; text-decoration: none; text-align: center;">Need an account? Sign up</a>
+                    <a href="#" id="toggle-auth" style="color: var(--logo-color); font-weight: bold; text-decoration: none; text-align: center;">Need an account? F up</a>
                 </div>
                 <p id="auth-message" style="color: #ff4444; margin-top: 15px; text-align: center; font-weight: bold;"></p>
             </form>
