@@ -571,25 +571,41 @@ function initializeScripts() {
         });
     }
 
-    // Listing Page UI Logic
-    const mainImg = document.getElementById('main-listing-image');
-    const thumbBtns = document.querySelectorAll('.thumbnail-btn');
-    const dots = document.querySelectorAll('.dot');
+    const urlParamsStaticCheck = new URLSearchParams(window.location.search);
 
-    if (mainImg && thumbBtns.length > 0) {
-        function setActiveSlide(index) {
-            const targetThumb = thumbBtns[index];
-            if (!targetThumb) return;
 
-            mainImg.src = targetThumb.dataset.src;
-            mainImg.alt = targetThumb.dataset.alt;
+    if (!urlParamsStaticCheck.get('id')) {
+        const mainImg = document.getElementById('main-listing-image');
+        const thumbBtns = document.querySelectorAll('.thumbnail-btn');
+        const dots = document.querySelectorAll('.dot');
 
-            thumbBtns.forEach((btn, i) => btn.classList.toggle('active', i === index));
-            dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+        if (mainImg && thumbBtns.length > 0) {
+            let currentStaticIndex = 0;
+
+            function setActiveSlide(index) {
+                currentStaticIndex = index;
+                const targetThumb = thumbBtns[index];
+                if (!targetThumb) return;
+
+                mainImg.src = targetThumb.dataset.src;
+                mainImg.alt = targetThumb.dataset.alt;
+
+                thumbBtns.forEach((btn, i) => btn.classList.toggle('active', i === index));
+                dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+            }
+
+            thumbBtns.forEach(btn => btn.addEventListener('click', () => setActiveSlide(Number(btn.dataset.index))));
+            dots.forEach(dot => dot.addEventListener('click', () => setActiveSlide(Number(dot.dataset.index))));
+
+            mainImg.style.cursor = 'pointer';
+            mainImg.addEventListener('click', () => {
+                let nextIndex = currentStaticIndex + 1;
+                if (nextIndex >= thumbBtns.length) {
+                    nextIndex = 0;
+                }
+                setActiveSlide(nextIndex);
+            });
         }
-
-        thumbBtns.forEach(btn => btn.addEventListener('click', () => setActiveSlide(Number(btn.dataset.index))));
-        dots.forEach(dot => dot.addEventListener('click', () => setActiveSlide(Number(dot.dataset.index))));
     }
 
     const replyPanel = document.getElementById('reply-panel');
@@ -966,10 +982,57 @@ if (saveBtn) {
                 if (descContainer) descContainer.innerHTML = `<p>${listing.description}</p>`;
 
                 const thumbRow = document.getElementById('thumbnail-row');
-                if (thumbRow) thumbRow.style.display = 'none';
                 const galleryDots = document.getElementById('gallery-dots');
-                if (galleryDots) galleryDots.style.display = 'none';
+                
+                const imagesArray = listing.images || (listing.image ? [listing.image] : ['images/placeholderImage.png']);
+                
+                if (imagesArray.length > 1 && thumbRow && galleryDots) {
+                    thumbRow.style.display = 'flex';
+                    galleryDots.style.display = 'flex';
+                    
+                    thumbRow.innerHTML = '';
+                    galleryDots.innerHTML = '';
+                    
+                    let currentIndex = 0; 
+                    
+                    const goToSlide = (index) => {
+                        currentIndex = index;
+                        if (mainImage) mainImage.src = imagesArray[currentIndex];
+                        
+                        Array.from(thumbRow.children).forEach((btn, i) => btn.classList.toggle('active', i === currentIndex));
+                        Array.from(galleryDots.children).forEach((d, i) => d.classList.toggle('active', i === currentIndex));
+                    };
 
+                    imagesArray.forEach((imgBase64, index) => {
+                        const thumbBtn = document.createElement('button');
+                        thumbBtn.className = `thumbnail-btn ${index === 0 ? 'active' : ''}`;
+                        thumbBtn.innerHTML = `<img src="${imgBase64}" alt="Thumbnail ${index + 1}">`;
+                        thumbRow.appendChild(thumbBtn);
+                        
+                        const dot = document.createElement('button');
+                        dot.className = `dot ${index === 0 ? 'active' : ''}`;
+                        galleryDots.appendChild(dot);
+                        
+                        thumbBtn.addEventListener('click', () => goToSlide(index));
+                        dot.addEventListener('click', () => goToSlide(index));
+                    });
+                    
+                    if (mainImage) {
+                        mainImage.style.cursor = 'pointer'; 
+                        mainImage.addEventListener('click', () => {
+                            let nextIndex = currentIndex + 1;
+                            if (nextIndex >= imagesArray.length) {
+                                nextIndex = 0;
+                            }
+                            goToSlide(nextIndex);
+                        });
+                    }
+
+                } else {
+                    if (thumbRow) thumbRow.style.display = 'none';
+                    if (galleryDots) galleryDots.style.display = 'none';
+                    if (mainImage) mainImage.style.cursor = 'default';
+                }
                 const currentUser = JSON.parse(localStorage.getItem('currentUser'));
                 
                 if (currentUser) {
