@@ -830,14 +830,17 @@ if (saveBtn) {
             if (listingToEdit) {
                 document.querySelector('.listing-page h1').textContent = 'Edit Listing';
                 document.getElementById('listing-title').value = listingToEdit.title;
-                document.getElementById('category').value = listingToEdit.category;
-                if (document.getElementById('subcategory')) document.getElementById('subcategory').value = listingToEdit.subcategory || '';
+                const categoryInput = document.getElementById('category');
+                categoryInput.value = listingToEdit.category;      
+                categoryInput.dispatchEvent(new Event('change')); 
+                if (document.getElementById('subcategory')) {
+                    document.getElementById('subcategory').value = listingToEdit.subcategory || '';
+                }  
                 document.getElementById('price').value = listingToEdit.price;
                 document.getElementById('location').value = listingToEdit.location;
                 if (document.getElementById('tags')) document.getElementById('tags').value = listingToEdit.tags || '';
                 document.getElementById('description').value = listingToEdit.description;
                 
-                // Moved safely inside the null check
                 if (listingToEdit.images && Array.isArray(listingToEdit.images)) {
                     currentImagesBase64 = [...listingToEdit.images];
                 } else if (listingToEdit.image) {
@@ -891,8 +894,8 @@ if (saveBtn) {
                     formMessage.textContent = 'Your listing has been posted!';
 
                     listingForm.reset();
-                    currentImagesBase64 = []; // Reset the array
-                    renderImagePreviews();    // Clear the visual preview boxes
+                    currentImagesBase64 = []; 
+                    renderImagePreviews(); 
                 }
             
             
