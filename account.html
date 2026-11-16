@@ -24,23 +24,68 @@
                     <label for="username" >Username</label>
                     <input type="text" id="username" placeholder="Enter username" required>
                 </div>
-                <div class="form-group login-only">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" placeholder="Enter password" required>
-                </div>
+                
+<!-- Login Password -->
+<div class="form-group login-only">
+    <label for="password">Password</label>
+    <input type="password" id="password"
+        placeholder="Enter password" required>
+
+    <!-- Show or hide login password -->
+    <label class="show-password-option">
+        <input type="checkbox" id="show-login-password">
+        <span>Show Password</span>
+    </label>
+</div>
+
                 <div class="form-group signup-only">
                     <label for="signup-username"> Create Username</label>
                     
                     <input type="text" id="signup-username" placeholder="Enter username"required>
                 </div>
-                <div class="form-group signup-only">
-                    <label for="signup-password">Create Password</label>
-                    <input type="password" id="signup-password" placeholder="Enter password"required>
-                </div>
-                <div class="form-group signup-only">
-                    <label for="signup-confirm-password">Confirm Password</label>
-                    <input type="password" id="signup-confirm-password" placeholder="Confirm password"required>
-                </div>
+                
+<!-- Create Password -->
+<div class="form-group signup-only">
+    <label for="signup-password">Create Password</label>
+    <input type="password" id="signup-password"
+        placeholder="Enter password"
+        autocomplete="new-password"
+        aria-describedby="signup-strength-message"
+        required>
+
+    <!-- Password strength checker -->
+    <div class="signup-strength">
+        <div class="signup-strength-bar"
+            id="signup-strength-meter"
+            role="progressbar"
+            aria-label="Password strength"
+            aria-valuemin="0"
+            aria-valuemax="4"
+            aria-valuenow="0">
+
+            <div id="signup-strength-fill"></div>
+        </div>
+
+        <p id="signup-strength-message" aria-live="polite">
+            Use at least 8 characters.
+        </p>
+    </div>
+</div>
+          
+<!-- Confirm Password -->
+<div class="form-group signup-only">
+    <label for="signup-confirm-password">Confirm Password</label>
+
+    <input type="password" id="signup-confirm-password"
+        placeholder="Confirm password" required>
+
+    <!-- Show or hide both signup passwords -->
+    <label class="show-password-option">
+        <input type="checkbox" id="show-signup-passwords">
+        <span>Show Passwords</span>
+    </label>
+</div>
+
                 <div class="form-group signup-only">
                     <label for="signup-email">Enter Email</label>
                     <input type="email" id="signup-email" placeholder="Enter email"required>

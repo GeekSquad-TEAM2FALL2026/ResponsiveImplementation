@@ -1404,3 +1404,145 @@ if (document.readyState === 'loading') {
     setupAccountDashboard();
 }
 
+
+// Password Strength Checker for Sign Up
+
+function setupSignupStrength() {
+    const signupPassword = document.getElementById('signup-password');
+    const confirmPassword = document.getElementById('signup-confirm-password');
+    const loginPassword = document.getElementById('password');
+
+    const strengthFill = document.getElementById('signup-strength-fill');
+    const strengthMessage = document.getElementById('signup-strength-message');
+    const strengthMeter = document.getElementById('signup-strength-meter');
+    const authForm = document.getElementById('auth-form');
+
+    // Show Password checkboxes
+    const showLogin = document.getElementById('show-login-password');
+    const showSignup = document.getElementById('show-signup-passwords');
+
+    // Only run this on the account page
+    if (!signupPassword || !strengthFill || !strengthMessage) return;
+
+    // Show or hide login password
+    if (showLogin && loginPassword) {
+        function updateLoginPassword() {
+            loginPassword.type = showLogin.checked ? 'text' : 'password';
+        }
+
+        showLogin.addEventListener('change', updateLoginPassword);
+        updateLoginPassword();
+    }
+
+    // Show or hide both signup passwords
+    if (showSignup && confirmPassword) {
+        function updateSignupPasswords() {
+            const type = showSignup.checked ? 'text' : 'password';
+
+            signupPassword.type = type;
+            confirmPassword.type = type;
+        }
+
+        showSignup.addEventListener('change', updateSignupPasswords);
+        updateSignupPasswords();
+    }
+
+    // Check password strength while typing
+    function checkStrength() {
+        const password = signupPassword.value;
+        let level = 0;
+        let message = 'Use at least 12 characters and a mix of characters.';
+
+        // Check for different character types
+        const types = [
+            /[a-z]/.test(password),
+            /[A-Z]/.test(password),
+            /[0-9]/.test(password),
+            /[^a-zA-Z0-9]/.test(password)
+        ].filter(Boolean).length;
+
+        if (password.length === 0) {
+            level = 0;
+        } else if (password.length < 8) {
+            level = 1;
+            message = 'Too short. Use at least 12 characters.';
+        } else if (password.length < 10 || types < 2) {
+            level = 2;
+            message = 'Fair. Add more characters and different types.';
+        } else if (password.length < 12 || types < 3) {
+            level = 3;
+            message = 'Good. Use 12 characters and at least 3 types.';
+        } else {
+            level = 4;
+            message = 'Strong password! You can create your account.';
+        }
+
+        // Update strength bar as the user types
+        strengthFill.style.width = (level * 25) + '%';
+        strengthFill.dataset.level = String(level);
+        strengthMessage.textContent = message;
+
+        if (strengthMeter) {
+            strengthMeter.setAttribute('aria-valuenow', String(level));
+        }
+
+        // Show red border until password is strong
+        signupPassword.classList.toggle(
+            'signup-invalid',
+            level > 0 && level < 4
+        );
+
+        // Show green border for strong passwords
+        signupPassword.classList.toggle(
+            'signup-valid',
+            level === 4
+        );
+
+        // Only Strong passwords are accepted
+        return level === 4;
+    }
+
+    // Check while typing or leaving the field
+    signupPassword.addEventListener('input', checkStrength);
+    signupPassword.addEventListener('blur', checkStrength);
+
+    // Block signup if password is not strong enough
+    if (authForm) {
+        document.addEventListener('submit', (event) => {
+            if (event.target !== authForm) return;
+
+            const signupSection = signupPassword.closest('.signup-only');
+
+            // Do not affect the Log In page
+            if (!signupSection ||
+                signupSection.getClientRects().length === 0) {
+                return;
+            }
+
+            // Stop account creation if password is not Strong
+            if (!checkStrength()) {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+
+                strengthMessage.textContent =
+                    'Please create a Strong password before signing up.';
+
+                signupPassword.classList.add('signup-invalid');
+                signupPassword.focus();
+            }
+        }, true);
+    }
+
+    // Set the starting strength message
+    checkStrength();
+}
+
+// Run password checker when the page loads
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupSignupStrength);
+} else {
+    setupSignupStrength();
+}
+
+
+
