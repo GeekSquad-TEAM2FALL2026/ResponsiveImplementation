@@ -459,7 +459,13 @@ function initializeScripts() {
             <div class="item-details">
                 <span class="price">$${listing.price}</span>
                 <h2 class="item-title">${listing.title}</h2>
-                <span class="item-location">${listing.location}</span>
+                
+                <!-- NEW: Flex container for location and date -->
+                <div class="item-meta-row">
+                    <span class="item-location">${listing.location}</span>
+                    <span class="item-date">${listing.timestamp || ''}</span>
+                </div>
+                
                 <span style="display: none;" class="search-category">${listing.category || ''}</span>
                 <span style="display: none;" class="search-tags">${listing.subcategory || ''} ${listing.tags || ''}</span>
             </div>
@@ -563,8 +569,8 @@ function initializeScripts() {
 
                 if (sortVal === 'price-asc') return priceA - priceB;
                 if (sortVal === 'price-desc') return priceB - priceA;
-                if (sortVal === 'date-newest') return indexB - indexA;
-                return indexA - indexB;
+                if (sortVal === 'date-newest') return indexA - indexB;
+                return indexB - indexA;
             });
 
             items.forEach(item => itemListingsContainer.appendChild(item));
@@ -872,6 +878,13 @@ if (saveBtn) {
             if (postButton.disabled) return;
 
             postButton.disabled = true;
+            
+            const now = new Date();
+            const dateString = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            const timeString = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+            const timestamp = `${dateString}, ${timeString}`;
+
+            let existingListings = JSON.parse(localStorage.getItem('userListings') || '[]');
 
             const newListing = {
                 id: editId ? editId : Date.now().toString(),
@@ -883,12 +896,11 @@ if (saveBtn) {
                 location: document.getElementById('location').value,
                 tags: document.getElementById('tags').value, 
                 description: document.getElementById('description').value,
-                images: currentImagesBase64.length > 0 ? currentImagesBase64 : ['images/placeholderImage.png']
+                images: currentImagesBase64.length > 0 ? currentImagesBase64 : ['images/placeholderImage.png'],
+                timestamp: editId ? (existingListings.find(l => l.id === editId)?.timestamp || timestamp) : timestamp
             };
 
             showLoadingState(editId ? 'Updating listing...' : 'Posting your listing...', () => {
-                let existingListings = JSON.parse(localStorage.getItem('userListings') || '[]');
-
                 if (editId) {
                     const index = existingListings.findIndex(l => l.id === editId);
                     if (index !== -1) existingListings[index] = newListing;
@@ -909,8 +921,6 @@ if (saveBtn) {
                     currentImagesBase64 = []; 
                     renderImagePreviews(); 
                 }
-            
-            
             });
         });
     }
@@ -977,6 +987,9 @@ if (saveBtn) {
 
                 const locationSubtitle = document.getElementById('listing-location');
                 if (locationSubtitle) locationSubtitle.textContent = listing.location;
+
+                const timestampSpan = document.getElementById('listing-timestamp');
+                if (timestampSpan) timestampSpan.textContent = listing.timestamp || '';
 
                 const badgesContainer = document.getElementById('listing-badges');
                 if (badgesContainer) {

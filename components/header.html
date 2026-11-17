@@ -1,10 +1,22 @@
 <header>
-    <button class="hamburger" id="hamburger-btn" aria-label="Toggle Menu">
-        <span></span><span></span><span></span>
-    </button>
+    <div class="header-left">
+        <button class="hamburger" id="hamburger-btn" aria-label="Toggle Menu">
+            <span></span><span></span><span></span>
+        </button>
+        
+        <a href="index.html" class="brand-link">
+            <svg class="peace-icon-sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" stroke="#8A38F5" stroke-width="8" fill="none"/>
+                <line x1="50" y1="5" x2="50" y2="95" stroke="#8A38F5" stroke-width="8"/>
+                <line x1="50" y1="50" x2="15" y2="85" stroke="#8A38F5" stroke-width="8"/>
+                <line x1="50" y1="50" x2="85" y2="85" stroke="#8A38F5" stroke-width="8"/>
+            </svg>
+            <span class="brand-text-desktop">Craigslist</span>
+        </a>
+    </div>
     <nav id="nav-menu" class="nav-menu">
         <ul>
-            <li><a href="index.html">Home</a></li>
+        <li class="hide-on-desktop"><a href="index.html">Home</a></li>
             <li class="nav-dropdown-container">
                 <a href="#" id="categories-btn">Categories <span id="cat-arrow">▼</span></a>
                 <ul class="dropdown-menu categories-list" id="categories-dropdown">

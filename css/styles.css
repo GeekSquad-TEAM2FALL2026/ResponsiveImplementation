@@ -226,7 +226,7 @@ border-radius: 4px;
 }
 
 .categories-list {
-max-height: 250px;
+max-height: none;
 overflow-y: auto;
 }
 
@@ -643,6 +643,20 @@ color: var(--text-color);
 opacity: 0.75;
 }
 
+.item-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-top: 2px;
+}
+
+.item-date {
+    font-size: 0.75rem;
+    color: var(--text-color);
+    opacity: 0.6;
+}
+
 /* Auto-complete Dropdown row styling */
 .dropdown-item-row {
 display: flex;
@@ -787,15 +801,19 @@ animation: loadingSpin 0.8s linear infinite;
     color: var(--logo-color);
 }
 
-input, select, textarea {
+input:not([type="checkbox"]):not([type="radio"]), select, textarea {
     border: 1px solid var(--image-placehold); 
     border-radius: 4px;
     outline: none; 
 }
 
-input:focus, select:focus, textarea:focus {
+input:not([type="checkbox"]):not([type="radio"]):focus, select:focus, textarea:focus {
     border-color: var(--logo-color); 
     box-shadow: 0 0 5px color-mix(in srgb, var(--logo-color) 30%, transparent); 
+}
+
+body.has-hero-search .brand-link {
+    visibility: hidden !important;
 }
 
 @keyframes loadingSpin {
@@ -830,7 +848,10 @@ animation: none;
     background: none;
     box-shadow: none;
     padding: 0;
+    margin-left: 2rem;
+    margin-right: auto;
 }
+
 
 .nav-menu > ul {
     flex-direction: row;
@@ -914,5 +935,8 @@ animation: none;
     gap: 2rem 1.5rem;
 }
 
+.hide-on-desktop {
+    display: none !important;
+}
 
 }
