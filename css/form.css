@@ -602,4 +602,106 @@ body.dark-mode .inline-feedback.success {
 }
 
 
+/* Change Password and Forgot Password */
+
+#forgot-password-panel[hidden],
+#auth-form[hidden] {
+    display: none;
+}
+
+#forgot-password-panel {
+    max-width: 400px;
+    margin: 20px auto;
+}
+
+.account-help-text {
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+/* Inline messages for password fields */
+.password-feedback {
+    font-size: 14px;
+    line-height: 1.4;
+    margin-top: 4px;
+}
+
+.password-feedback:empty {
+    display: none;
+}
+
+.password-feedback.error {
+    color: #B42318;
+}
+
+.password-feedback.success {
+    color: #166534;
+}
+
+body.dark-mode .password-feedback.error {
+    color: #FF9999;
+}
+
+body.dark-mode .password-feedback.success {
+    color: #86EFAC;
+}
+
+/* Red border for incorrect information */
+.password-invalid {
+    outline: 2px solid #D93025;
+}
+
+/* Green border for correct information */
+.password-valid {
+    outline: 2px solid #188038;
+}
+
+/* Show Password checkbox */
+.change-show-password {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 15px 0 20px;
+    cursor: pointer;
+}
+
+.change-show-password input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--logo-color);
+}
+
+/* Keep buttons consistent with the project */
+#change-password-form .post-btn,
+#forgot-password-form .post-btn {
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* Confirmation messages */
+#change-password-message,
+#recovery-message {
+    margin-top: 15px;
+    line-height: 1.5;
+    color: var(--text-color);
+}
+
+/* Forgot Password link */
+#forgot-password-link,
+.back-login {
+    display: block;
+    margin-top: 12px;
+    text-align: center;
+    color: var(--logo-color);
+    font-weight: bold;
+    text-decoration: none;
+}
+
+#forgot-password-link:hover,
+.back-login:hover {
+    text-decoration: underline;
+}
+
+
+
 

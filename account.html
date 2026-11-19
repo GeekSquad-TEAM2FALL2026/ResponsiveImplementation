@@ -95,9 +95,43 @@
                 <div class="form-actions" style="flex-direction: column; gap: 15px; margin-top: 10px;">
                     <button type="submit" class="post-btn" style="width: 100%;">Submit</button>
                     <a href="#" id="toggle-auth" style="color: var(--logo-color); font-weight: bold; text-decoration: none; text-align: center;">Need an account? Sign up</a>
+                <!-- Forgot Password Link -->
+                <a href="#" id="forgot-password-link" class="login-only">
+                    Forgot Password?
+                </a>
                 </div>
                 <p id="auth-message" style="color: #ff4444; margin-top: 15px; text-align: center; font-weight: bold;"></p>
             </form>
+            
+            <!-- Forgot Password Section -->
+            <div id="forgot-password-panel" hidden>
+                <p class="account-help-text">
+                    Enter your email to request a password reset.
+                </p>
+
+                <form id="forgot-password-form" novalidate>
+                    <div class="form-group">
+                        <label for="recovery-email">Email Address *</label>
+
+                        <input type="email" id="recovery-email"
+                            placeholder="Enter your account email"
+                            autocomplete="email" required>
+
+                        <p id="recovery-feedback"
+                            class="password-feedback" aria-live="polite"></p>
+                    </div>
+
+                    <button type="submit" class="post-btn">
+                        Request Password Reset
+                    </button>
+
+                    <p id="recovery-message" role="status"></p>
+                </form>
+
+                <a href="#" id="back-to-login" class="back-login">
+                    Back to Log In
+                </a>
+            </div>
         </div>
 
 <!-- Account Dashboard -->
@@ -120,6 +154,12 @@
 
             <button type="button" class="account-tab"
                 data-panel="details-panel">Account Details</button>
+
+            <!-- Change Password Menu -->
+            <button type="button" class="account-tab"
+                data-panel="password-panel">
+                Change Password
+            </button>
 
             <button type="button" class="account-tab"
                 data-panel="settings-panel">Settings</button>
@@ -192,6 +232,68 @@
                     </button>
 
                     <p id="details-message" role="status"></p>
+                </form>
+            </section>
+
+            <!-- Change Password Section -->
+            <section id="password-panel" class="account-panel" hidden>
+
+                <h2>Change Password</h2>
+                <p>Update the password for your account.</p>
+
+                <form id="change-password-form" novalidate>
+
+                    <!-- Current Password -->
+                    <div class="form-group">
+                        <label for="current-password">Current Password *</label>
+
+                        <input type="password" id="current-password"
+                            placeholder="Enter current password"
+                            autocomplete="current-password" required>
+
+                        <p id="current-password-feedback"
+                            class="password-feedback" aria-live="polite"></p>
+                    </div>
+
+                    <!-- New Password -->
+                    <div class="form-group">
+                        <label for="new-password">New Password *</label>
+
+                        <input type="password" id="new-password"
+                            placeholder="Enter new password"
+                            autocomplete="new-password" required>
+
+                        <p id="new-password-feedback"
+                            class="password-feedback" aria-live="polite"></p>
+                    </div>
+
+                    <!-- Confirm New Password -->
+                    <div class="form-group">
+                        <label for="confirm-new-password">
+                            Confirm New Password *
+                        </label>
+
+                        <input type="password" id="confirm-new-password"
+                            placeholder="Confirm new password"
+                            autocomplete="new-password" required>
+
+                        <p id="confirm-new-password-feedback"
+                            class="password-feedback" aria-live="polite"></p>
+                    </div>
+
+                    <!-- Show Passwords -->
+                    <label class="change-show-password">
+                        <input type="checkbox" id="show-change-passwords">
+                        Show Passwords
+                    </label>
+
+                    <!-- Save -->
+                    <button type="submit" class="post-btn">
+                        Update Password
+                    </button>
+
+                    <p id="change-password-message" role="status"></p>
+
                 </form>
             </section>
 

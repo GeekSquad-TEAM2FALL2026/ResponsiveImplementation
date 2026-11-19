@@ -1230,16 +1230,147 @@ if (saveBtn) {
                         window.location.href = `formPage.html?edit=${listing.id}`;
                     };
                     
-                    document.getElementById('listing-delete-btn').onclick = () => {
-                        if (confirm('Are you sure you want to delete this listing permanently?')) {
-                            let currentListings = JSON.parse(localStorage.getItem('userListings') || '[]');
-                            currentListings = currentListings.filter(l => String(l.id) !== String(listing.id));
-                            localStorage.setItem('userListings', JSON.stringify(currentListings));
-                            
-                            alert('Listing deleted.');
-                            window.location.href = 'searchResultsPage.html'; 
+                    
+                    // Delete Listing - Confirmation and Validation
+
+                    const deleteButton = document.getElementById('listing-delete-btn');
+                    const deleteDialog = document.getElementById('delete-listing-dialog');
+                    const deleteForm = document.getElementById('delete-listing-form');
+                    const deleteInput = document.getElementById('delete-confirm-text');
+                    const deleteFeedback = document.getElementById('delete-feedback');
+                    const deleteCancel = document.getElementById('delete-cancel-btn');
+                    const deleteConfirm = document.getElementById('delete-confirm-btn');
+
+                    // Set up the confirmation window
+                    if (deleteButton && deleteDialog && deleteForm &&
+                        deleteInput && deleteFeedback && deleteCancel && deleteConfirm) {
+
+                        // Open confirmation when Delete is clicked
+                        deleteButton.onclick = () => {
+                            deleteForm.reset();
+
+                            deleteInput.disabled = false;
+                            deleteCancel.disabled = false;
+                            deleteConfirm.disabled = false;
+
+                            deleteInput.classList.remove('delete-invalid', 'delete-valid');
+                            deleteInput.setAttribute('aria-invalid', 'false');
+
+                            deleteFeedback.textContent = '';
+                            deleteFeedback.className = 'delete-feedback';
+
+                            deleteDialog.showModal();
+                            deleteInput.focus();
+                        };
+
+                        // Check if the user typed DELETE correctly
+                        function checkDeleteText() {
+                            const value = deleteInput.value.trim();
+                            const valid = value === 'DELETE';
+
+                            if (!value) {
+                                deleteFeedback.textContent =
+                                    'Type DELETE before deleting this listing.';
+                            } else if (!valid) {
+                                deleteFeedback.textContent =
+                                    'Type DELETE exactly in capital letters.';
+                            } else {
+                                deleteFeedback.textContent =
+                                    'Confirmed. You can delete this listing.';
+                            }
+
+                            // Show red for errors and green for correct input
+                            deleteFeedback.className =
+                                'delete-feedback ' + (valid ? 'success' : 'error');
+
+                            deleteInput.classList.toggle('delete-invalid', !valid);
+                            deleteInput.classList.toggle('delete-valid', valid);
+                            deleteInput.setAttribute('aria-invalid', String(!valid));
+
+                            return valid;
                         }
-                    };
+
+                        // Check as the user types or leaves the field
+                        deleteInput.addEventListener('input', checkDeleteText);
+
+                        deleteInput.addEventListener('blur', () => {
+                            if (deleteDialog.open) checkDeleteText();
+                        });
+
+                        // Cancel without deleting anything
+                        deleteCancel.addEventListener('click', () => {
+                            deleteDialog.close();
+                        });
+
+                        // Confirm deletion
+                        deleteForm.addEventListener('submit', (event) => {
+                            event.preventDefault();
+
+                            // Stop if DELETE was not entered correctly
+                            if (!checkDeleteText()) {
+                                deleteInput.focus();
+                                return;
+                            }
+
+                            // Make sure the signed-in user owns the listing
+                            const signedInUser = JSON.parse(
+                                localStorage.getItem('currentUser') || 'null'
+                            );
+
+                            if (!signedInUser || signedInUser.username !== listing.owner) {
+                                deleteFeedback.textContent =
+                                    'Only the listing owner can delete this post.';
+                                deleteFeedback.className = 'delete-feedback error';
+                                return;
+                            }
+
+                            // Get saved listings
+                            const currentListings = JSON.parse(
+                                localStorage.getItem('userListings') || '[]'
+                            );
+
+                            const match = currentListings.some(item =>
+                                String(item.id) === String(listing.id) &&
+                                item.owner === signedInUser.username
+                            );
+
+                            if (!match) {
+                                deleteFeedback.textContent =
+                                    'Listing not found. Refresh the page and try again.';
+                                deleteFeedback.className = 'delete-feedback error';
+                                return;
+                            }
+
+                            // Delete the selected listing
+                            const remainingListings = currentListings.filter(item =>
+                                String(item.id) !== String(listing.id)
+                            );
+
+                            localStorage.setItem(
+                                'userListings',
+                                JSON.stringify(remainingListings)
+                            );
+
+                            // Prevent another click after deleting
+                            deleteInput.disabled = true;
+                            deleteCancel.disabled = true;
+                            deleteConfirm.disabled = true;
+
+                            // Show success confirmation
+                            deleteFeedback.textContent =
+                                'Listing deleted. Returning to the category...';
+
+                            deleteFeedback.className = 'delete-feedback success';
+
+                            // Return to the correct category
+                            setTimeout(() => {
+                                window.location.href =
+                                    'searchResultsPage.html?category=' +
+                                    encodeURIComponent(listing.category || 'other');
+                            }, 1200);
+                        });
+}
+
                 }
             }
         }
@@ -2008,5 +2139,255 @@ if (document.readyState === 'loading') {
 }
 
 
+// Change Password and Forgot Password
+// Uses our existing demo accounts
+
+function setupPasswordOptions() {
+    const changeForm = document.getElementById('change-password-form');
+    const forgotForm = document.getElementById('forgot-password-form');
+    const authForm = document.getElementById('auth-form');
+    const authTitle = document.getElementById('auth-title');
+
+    const forgotLink = document.getElementById('forgot-password-link');
+    const forgotPanel = document.getElementById('forgot-password-panel');
+    const backLink = document.getElementById('back-to-login');
+
+    // Only run on the Account page
+    if (!authForm || authForm.dataset.passwordOptionsReady) return;
+    authForm.dataset.passwordOptionsReady = 'true';
+
+    // Forgot Password - visual simulation only
+    if (forgotLink && forgotPanel && backLink && forgotForm) {
+        forgotLink.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            authForm.hidden = true;
+            forgotPanel.hidden = false;
+            authTitle.textContent = 'Forgot Password';
+        });
+
+        // Go back to the existing login form
+        backLink.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            forgotPanel.hidden = true;
+            authForm.hidden = false;
+            authTitle.textContent = 'Log In';
+        });
+
+        const recoveryEmail = document.getElementById('recovery-email');
+        const recoveryFeedback = document.getElementById('recovery-feedback');
+        const recoveryMessage = document.getElementById('recovery-message');
+
+        function checkRecoveryEmail() {
+            const email = recoveryEmail.value.trim();
+            let error = '';
+
+            if (!email) {
+                error = 'Enter your account email.';
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                error = 'Enter an email like name@example.com.';
+            }
+
+            recoveryFeedback.textContent = error || 'Looks good!';
+            recoveryFeedback.className =
+                'password-feedback ' + (error ? 'error' : 'success');
+
+            recoveryEmail.classList.toggle('password-invalid', !!error);
+
+            return !error;
+        }
+
+        recoveryEmail.addEventListener('input', () => {
+            checkRecoveryEmail();
+            recoveryMessage.textContent = '';
+        });
+
+        recoveryEmail.addEventListener('blur', checkRecoveryEmail);
+
+        forgotForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            if (!checkRecoveryEmail()) return;
+
+            // No actual email is sent in our prototype
+            recoveryMessage.textContent =
+                'Demo only: A reset link would be sent if this email matched an account. No email was sent.';
+        });
+    }
+
+    // Change Password
+    if (!changeForm) return;
+
+    const currentField = document.getElementById('current-password');
+    const newField = document.getElementById('new-password');
+    const confirmField = document.getElementById('confirm-new-password');
+    const result = document.getElementById('change-password-message');
+
+    const fields = [currentField, newField, confirmField];
+
+    // Same Strong password rule as our Sign Up form
+    function strongEnough(password) {
+        const kinds = [
+            /[a-z]/,
+            /[A-Z]/,
+            /[0-9]/,
+            /[^a-zA-Z0-9]/
+        ].filter(regex => regex.test(password)).length;
+
+        return password.length >= 12 && kinds >= 3;
+    }
+
+    // Check each field and display an inline message
+    function checkPasswordField(field) {
+        const currentUser = JSON.parse(
+            localStorage.getItem('currentUser') || 'null'
+        );
+
+        const users = JSON.parse(
+            localStorage.getItem('users') || '[]'
+        );
+
+        const account = users.find(u =>
+            currentUser && u.username === currentUser.username
+        );
+
+        const value = field.value;
+        let error = '';
+
+        if (field === currentField) {
+            if (!value) {
+                error = 'Enter your current password.';
+            } else if (!account || account.password !== value.trim()) {
+                error = 'Current password is incorrect.';
+            }
+        }
+
+        if (field === newField) {
+            if (!value) {
+                error = 'Enter a new password.';
+            } else if (value !== value.trim()) {
+                error = 'Remove spaces from the start or end.';
+            } else if (!strongEnough(value)) {
+                error = 'Use 12+ characters and at least 3 types: uppercase, lowercase, numbers, symbols.';
+            } else if (account && account.password === value) {
+                error = 'Choose a password different from your current one.';
+            }
+        }
+
+        if (field === confirmField) {
+            if (!value) {
+                error = 'Confirm your new password.';
+            } else if (value !== newField.value) {
+                error = 'Passwords do not match.';
+            }
+        }
+
+        // Show message below the correct input
+        const feedback = document.getElementById(
+            field.id + '-feedback'
+        );
+
+        feedback.textContent = error || 'Looks good!';
+        feedback.className =
+            'password-feedback ' + (error ? 'error' : 'success');
+
+        field.classList.toggle('password-invalid', !!error);
+        field.classList.toggle('password-valid', !error);
+        field.setAttribute('aria-invalid', String(!!error));
+
+        return !error;
+    }
+
+    // Check while typing or leaving an input
+    fields.forEach(field => {
+        field.addEventListener('input', () => {
+            checkPasswordField(field);
+            result.textContent = '';
+
+            // Recheck confirmation if the new password changes
+            if (field === newField && confirmField.value) {
+                checkPasswordField(confirmField);
+            }
+        });
+
+        field.addEventListener('blur', () => {
+            checkPasswordField(field);
+        });
+    });
+
+    // Show or hide all three password inputs
+    const showChange = document.getElementById('show-change-passwords');
+
+    if (showChange) {
+        showChange.addEventListener('change', () => {
+            fields.forEach(field => {
+                field.type = showChange.checked ? 'text' : 'password';
+            });
+        });
+    }
+
+    // Save the new password
+    changeForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const valid = fields.map(checkPasswordField);
+
+        if (!valid.every(Boolean)) {
+            result.textContent = 'Please fix the highlighted fields.';
+            return;
+        }
+
+        const currentUser = JSON.parse(
+            localStorage.getItem('currentUser') || 'null'
+        );
+
+        const users = JSON.parse(
+            localStorage.getItem('users') || '[]'
+        );
+
+        const index = users.findIndex(u =>
+            currentUser && u.username === currentUser.username
+        );
+
+        if (index === -1) {
+            result.textContent = 'Account not found. Please log in again.';
+            return;
+        }
+
+        // Update password in our saved demo accounts
+        users[index].password = newField.value;
+
+        localStorage.setItem('users', JSON.stringify(users));
+
+        // Keep the logged-in account updated
+        localStorage.setItem('currentUser', JSON.stringify({
+            ...currentUser,
+            password: newField.value
+        }));
+
+        // Clear the fields after saving
+        changeForm.reset();
+
+        fields.forEach(field => {
+            field.type = 'password';
+            field.classList.remove('password-invalid', 'password-valid');
+
+            document.getElementById(
+                field.id + '-feedback'
+            ).textContent = '';
+        });
+
+        result.textContent =
+            'Password changed! Use your new password next time you log in.';
+    });
+}
+
+// Run when the page loads
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupPasswordOptions);
+} else {
+    setupPasswordOptions();
+}
 
 

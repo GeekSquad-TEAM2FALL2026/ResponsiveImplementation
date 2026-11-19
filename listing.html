@@ -96,6 +96,54 @@
             </div>
         </section>
     </main>
+
+        <!-- Delete Listing Confirmation -->
+        <dialog id="delete-listing-dialog" class="delete-dialog"
+            aria-labelledby="delete-dialog-title"
+            aria-describedby="delete-dialog-description">
+
+            <form id="delete-listing-form" novalidate>
+
+                <h2 id="delete-dialog-title">Delete Listing?</h2>
+
+                <p id="delete-dialog-description">
+                    Are you sure you want to delete this listing?
+                    This action cannot be undone.
+                </p>
+
+                <!-- User must type DELETE before continuing -->
+                <div class="delete-form-group">
+                    <label for="delete-confirm-text">
+                        Type DELETE to confirm *
+                    </label>
+
+                    <input type="text" id="delete-confirm-text"
+                        placeholder="Type DELETE"
+                        autocomplete="off"
+                        spellcheck="false"
+                        aria-describedby="delete-feedback">
+
+                    <!-- Inline validation message -->
+                    <p id="delete-feedback" class="delete-feedback"
+                        aria-live="polite"></p>
+                </div>
+
+                <!-- Confirmation Buttons -->
+                <div class="delete-actions">
+                    <button type="button" id="delete-cancel-btn"
+                        class="delete-cancel-btn">
+                        Cancel
+                    </button>
+
+                    <button type="submit" id="delete-confirm-btn"
+                        class="delete-confirm-btn">
+                        Delete Listing
+                    </button>
+                </div>
+
+            </form>
+        </dialog>
+
     <script src="js/HTMLInclude.min.js"></script>
     <script src="js/script.js"></script>
 
