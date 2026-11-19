@@ -292,6 +292,21 @@ function initializeScripts() {
     const urlParams = new URLSearchParams(window.location.search);
     const initialQuery = urlParams.get('q') || '';
 
+    // Remember the category when clicking the normal Post button
+    const chosenCategory = urlParams.get('category');
+
+    const postNav = document.querySelector(
+        '.nav-menu a[href="formPage.html"]'
+    );
+
+    if (chosenCategory && postNav &&
+        window.location.pathname.includes('searchResultsPage.html')) {
+
+        postNav.href = 'formPage.html?category=' +
+            encodeURIComponent(chosenCategory);
+    }
+
+
     function executeProductSearch(queryText) {
         const query = queryText.trim().toLowerCase();
         const resultUrl = query ? `searchResultsPage.html?q=${encodeURIComponent(query)}` : 'searchResultsPage.html';
@@ -447,6 +462,10 @@ function initializeScripts() {
             const li = document.createElement('li');
             li.className = 'item';
 
+            // Remember which category this listing belongs to
+            li.dataset.category = listing.category || 'other';
+
+
             // Simple click to navigate to the listing page
             li.onclick = () => {
                 window.location.href = `listing.html?id=${listing.id}`;
@@ -502,51 +521,95 @@ function initializeScripts() {
         'moog theremin': ['moog', 'theremin', 'synthesizer', 'synth', 'electronic music', 'audio equipment', 'musical instruments', 'for sale']
     };
 
-    function filterListingsOnPage(queryText) {
-        if (!itemListingsContainer) return;
-        const query = queryText.trim().toLowerCase();
-        const queryWords = query.split(/\s+/).filter(Boolean);
-        const items = Array.from(itemListingsContainer.querySelectorAll('.item'));
-        const heading = document.querySelector('.results-page h1');
+    
+// Filter listings by search text and category
+function filterListingsOnPage(queryText) {
+    if (!itemListingsContainer) return;
 
-        if (heading) {
-            heading.textContent = query ? `Search results for "${queryText.trim()}"` : 'Search Results';
-        }
+    const query = queryText.trim().toLowerCase();
+    const queryWords = query.split(/\s+/).filter(Boolean);
 
-        let visibleCount = 0;
-        items.forEach(item => {
-            let searchableText = item.textContent.toLowerCase();
+    // Find which category the user clicked
+    const params = new URLSearchParams(window.location.search);
+    const selectedCategory = params.get('category');
 
-            // Automatically append synonyms if the card contains "moog theremin"
-            Object.entries(ITEM_SYNONYM_MAP).forEach(([itemKey, keywords]) => {
-                if (searchableText.includes(itemKey)) {
-                    searchableText += ' ' + keywords.join(' ');
-                }
-            });
+    // Category names for page headings
+    const categoryNames = {
+        'community': 'Community',
+        'services': 'Services',
+        'for-sale': 'For Sale',
+        'housing': 'Housing',
+        'autos': 'Autos',
+        'jobs': 'Jobs',
+        'gigs': 'Gigs',
+        'discussion-forums': 'Discussion Forums',
+        'resumes': 'Resumes'
+    };
 
-            // Check if the full phrase matches, OR if every individual word in the search query matches
-            const isMatch = !query || 
-                            searchableText.includes(query) || 
-                            (queryWords.length > 0 && queryWords.every(word => searchableText.includes(word)));
+    const categoryName = categoryNames[selectedCategory];
+    const heading = document.querySelector('.results-page h1');
 
-            item.style.display = isMatch ? '' : 'none';
-            if (isMatch) visibleCount++;
-        });
-
-        let noResultsEl = document.getElementById('no-results-msg');
-        if (visibleCount === 0) {
-            if (!noResultsEl) {
-                noResultsEl = document.createElement('div');
-                noResultsEl.id = 'no-results-msg';
-                noResultsEl.className = 'no-results-message';
-                itemListingsContainer.insertAdjacentElement('afterend', noResultsEl);
-            }
-            noResultsEl.textContent = `No results found for "${queryText.trim()}"`;
-            noResultsEl.style.display = 'block';
-        } else if (noResultsEl) {
-            noResultsEl.style.display = 'none';
-        }
+    // Update the page title
+    if (heading) {
+        heading.textContent = categoryName
+            ? categoryName + ' Listings'
+            : (query ? `Search results for "${queryText.trim()}"` : 'Search Results');
     }
+
+    const items = itemListingsContainer.querySelectorAll('.item');
+    let visibleCount = 0;
+
+    items.forEach(item => {
+        let text = item.textContent.toLowerCase();
+
+        // Keep the existing Theremin search terms working
+        if (text.includes('moog theremin')) {
+            text += ' moog theremin synthesizer synth electronic music audio equipment musical instruments for sale';
+        }
+
+        // Check search text
+        const matchesSearch = !query ||
+            text.includes(query) ||
+            queryWords.every(word => text.includes(word));
+
+        // The five example listings are all For Sale
+        const itemCategory = item.dataset.category || 'for-sale';
+
+        // Check the selected category
+        const matchesCategory =
+            !categoryName || itemCategory === selectedCategory;
+
+        // Show only matching listings
+        const showItem = matchesSearch && matchesCategory;
+
+        item.style.display = showItem ? '' : 'none';
+
+        if (showItem) visibleCount++;
+    });
+
+    // Show a message if nothing matches
+    let noResults = document.getElementById('no-results-msg');
+
+    if (!noResults) {
+        noResults = document.createElement('div');
+        noResults.id = 'no-results-msg';
+        noResults.className = 'no-results-message';
+        itemListingsContainer.insertAdjacentElement('afterend', noResults);
+    }
+
+    if (visibleCount === 0) {
+        noResults.textContent = categoryName
+            ? (query
+                ? `No ${categoryName} listings match "${queryText.trim()}".`
+                : `No ${categoryName} listings yet.`)
+            : `No results found for "${queryText.trim()}".`;
+
+        noResults.style.display = 'block';
+    } else {
+        noResults.style.display = 'none';
+    }
+}
+
 
     if (itemListingsContainer && sortSelect) {
         filterListingsOnPage(initialQuery);
@@ -759,6 +822,24 @@ if (saveBtn) {
             });
         }
 
+        // Automatically choose the category from the URL
+        const categoryFromLink = urlParams.get('category');
+
+        if (!editId && categoryFromLink && categorySelect) {
+
+            // Only select categories that exist in the form
+            const found = Array.from(categorySelect.options).some(option => {
+                return option.value === categoryFromLink;
+            });
+
+            if (found) {
+                categorySelect.value = categoryFromLink;
+
+                // Update the subcategory dropdown too
+                categorySelect.dispatchEvent(new Event('change'));
+            }
+        }
+
         let currentImagesBase64 = []; 
         const photoContainer = document.getElementById('image-preview-container');
         const uploadTriggerBox = document.getElementById('upload-trigger-box');
@@ -910,17 +991,27 @@ if (saveBtn) {
 
                 localStorage.setItem('userListings', JSON.stringify(existingListings));
 
-                if (editId) {
-                    window.location.href = 'searchResultsPage.html';
-                } else {
-                    postButton.disabled = false;
-                    postButton.textContent = 'Post Another Listing';
-                    formMessage.textContent = 'Your listing has been posted!';
+                
+                // Open the correct category after posting
+                const categoryUrl = 'searchResultsPage.html?category=' +
+                    encodeURIComponent(newListing.category);
 
-                    listingForm.reset();
-                    currentImagesBase64 = []; 
-                    renderImagePreviews(); 
+                if (editId) {
+                    // Return to the category after editing
+                    window.location.href = categoryUrl;
+                } else {
+                    // Confirm the listing was posted
+                    postButton.textContent = 'Posted!';
+
+                    formMessage.textContent =
+                        'Your listing has been posted! Opening its category...';
+
+                    // Show confirmation, then redirect
+                    setTimeout(() => {
+                        window.location.href = categoryUrl;
+                    }, 1200);
                 }
+
             });
         });
     }
@@ -953,7 +1044,10 @@ if (saveBtn) {
                 if (breadcrumbCategory && listing.category) {
                     const formattedCat = listing.category.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
                     breadcrumbCategory.textContent = formattedCat;
-                    breadcrumbCategory.href = `searchResultsPage.html?q=${listing.category}`;
+                    
+                // Go back to the category this listing belongs to
+                breadcrumbCategory.href =
+                    `searchResultsPage.html?category=${encodeURIComponent(listing.category)}`;
                 }
                 
                 if (breadcrumbSub && breadcrumbSep) {
