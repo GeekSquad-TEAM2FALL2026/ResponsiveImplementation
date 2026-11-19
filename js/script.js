@@ -250,6 +250,22 @@ function initializeScripts() {
                     window.location.reload();
                 } else {
                     authMessage.textContent = 'Invalid username or password.';
+
+                    // Show login error under the password field too
+                    const passwordFeedback = document.getElementById(
+                        'validation-password'
+                    );
+
+                    if (passwordFeedback) {
+                        passwordFeedback.textContent =
+                            'Username or password is incorrect. Please try again.';
+
+                        passwordFeedback.className = 'inline-feedback error';
+                        passwordInput.classList.add('field-error');
+                        passwordInput.classList.remove('field-valid');
+                        passwordInput.setAttribute('aria-invalid', 'true');
+                    }
+
                 }
             } else {
                 const username = signupUsernameInput.value.trim();
@@ -1556,7 +1572,7 @@ function setupSignupStrength() {
 
     // Check password strength while typing
     function checkStrength() {
-        const password = signupPassword.value;
+        const password = signupPassword.value.trim();
         let level = 0;
         let message = 'Use at least 12 characters and a mix of characters.';
 
@@ -1629,6 +1645,10 @@ function setupSignupStrength() {
             // Stop account creation if password is not Strong
             if (!checkStrength()) {
                 event.preventDefault();
+
+                // Show any other form errors too
+                validateAllFormFields(authForm);
+
                 event.stopImmediatePropagation();
 
                 strengthMessage.textContent =
@@ -1650,6 +1670,343 @@ if (document.readyState === 'loading') {
 } else {
     setupSignupStrength();
 }
+
+
+// Inline Form Validation
+// Checks Login, Sign Up, and Create Listing fields
+
+// Find out what is wrong with each field
+function getFormFieldError(field) {
+    const value = field.value.trim();
+
+    switch (field.id) {
+
+        // Login Fields
+        case 'username':
+            return value ? '' : 'Enter your username to log in.';
+
+        case 'password':
+            return value ? '' : 'Enter your password to log in.';
+
+        // Sign Up Username
+        case 'signup-username': {
+            if (!value) return 'Please create a username.';
+
+            if (!/^[a-zA-Z0-9_]{3,20}$/.test(value)) {
+                return 'Use 3-20 letters, numbers, or underscores.';
+            }
+
+            // Check if username is already taken
+            const users = JSON.parse(
+                localStorage.getItem('users') || '[]'
+            );
+
+            const taken = users.some(user =>
+                user.username.toLowerCase() === value.toLowerCase()
+            );
+
+            if (taken) return 'That username is taken. Try another.';
+
+            return '';
+        }
+
+        // Sign Up Password
+        case 'signup-password': {
+            const types = [
+                /[a-z]/,
+                /[A-Z]/,
+                /[0-9]/,
+                /[^a-zA-Z0-9]/
+            ].filter(pattern => pattern.test(value)).length;
+
+            if (value.length < 12) {
+                return 'Add ' + (12 - value.length) +
+                    ' more character(s) to reach 12.';
+            }
+
+            if (types < 3) {
+                return 'Use at least 3 types: lowercase, uppercase, numbers, or symbols.';
+            }
+
+            return '';
+        }
+
+        // Confirm Password
+        case 'signup-confirm-password': {
+            if (!value) return 'Please confirm your password.';
+
+            const password = document.getElementById(
+                'signup-password'
+            ).value.trim();
+
+            if (value !== password) {
+                return 'Passwords do not match. Enter the same password.';
+            }
+
+            return '';
+        }
+
+        // Sign Up Email
+        case 'signup-email':
+            if (!value) return 'Please enter your email address.';
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                return 'Enter a valid email, like name@example.com.';
+            }
+
+            return '';
+
+        // Create Listing Title
+        case 'listing-title':
+            if (!value) return 'Enter a title for your listing.';
+
+            if (value.length < 5) {
+                return 'Use at least 5 characters for the title.';
+            }
+
+            if (value.length > 100) {
+                return 'Keep the title under 100 characters.';
+            }
+
+            return '';
+
+        // Category
+        case 'category':
+            return value ? '' : 'Please choose a category.';
+
+        // Subcategory
+        case 'subcategory':
+            return value ? '' : 'Please choose a subcategory.';
+
+        // Price
+        case 'price': {
+            if (!value) {
+                return 'Enter a price (use 0 if the item is free).';
+            }
+
+            // Remove commas before checking the number
+            const price = value.replace(/,/g, '');
+
+            if (!/^\d+$/.test(price)) {
+                return 'Enter a whole number, like 850 or 1,200.';
+            }
+
+            return '';
+        }
+
+        // Location
+        case 'location':
+            if (!value) return 'Enter a city or location.';
+
+            if (value.length < 2) {
+                return 'Enter at least 2 characters.';
+            }
+
+            return '';
+
+        // Tags (optional)
+        case 'tags':
+            if (value.length > 150) {
+                return 'Keep tags under 150 characters.';
+            }
+
+            return '';
+
+        // Listing Description
+        case 'description':
+            if (!value) {
+                return 'Describe the item you are posting.';
+            }
+
+            if (value.length < 20) {
+                return 'Write at least 20 characters in the description.';
+            }
+
+            if (value.length > 2000) {
+                return 'Keep the description under 2,000 characters.';
+            }
+
+            return '';
+    }
+
+    return '';
+}
+
+
+// Only check fields that are currently visible
+function formFieldIsVisible(field) {
+    const section = field.closest('.login-only, .signup-only');
+
+    return !section || section.getClientRects().length > 0;
+}
+
+
+// Show error or success under the field
+function validateFormField(field) {
+    if (!formFieldIsVisible(field)) return true;
+
+    const error = getFormFieldError(field);
+    const feedback = document.getElementById(
+        'validation-' + field.id
+    );
+
+    if (!feedback) return !error;
+
+    // Display the message
+    feedback.textContent = error ||
+        (field.value.trim() ? 'Looks good!' : '');
+
+    feedback.className = 'inline-feedback ' +
+        (error ? 'error' : 'success');
+
+    // Change the border color
+    field.classList.toggle('field-error', !!error);
+
+    field.classList.toggle(
+        'field-valid',
+        !error && !!field.value.trim()
+    );
+
+    field.setAttribute('aria-invalid', String(!!error));
+
+    return !error;
+}
+
+
+// Check every field before submitting a form
+function validateAllFormFields(form) {
+    const fields = form.querySelectorAll('[data-check-field]');
+    let allValid = true;
+    let firstInvalid = null;
+
+    fields.forEach(field => {
+        if (!formFieldIsVisible(field)) return;
+
+        if (!validateFormField(field)) {
+            allValid = false;
+
+            if (!firstInvalid) {
+                firstInvalid = field;
+            }
+        }
+    });
+
+    // Move focus to the first incorrect field
+    if (firstInvalid) firstInvalid.focus();
+
+    return allValid;
+}
+
+
+// Set up validation on our existing forms
+function setupInlineFormValidation() {
+
+    // All fields that need validation
+    const forms = {
+        'auth-form': [
+            'username',
+            'password',
+            'signup-username',
+            'signup-password',
+            'signup-confirm-password',
+            'signup-email'
+        ],
+
+        'listing-form': [
+            'listing-title',
+            'category',
+            'price',
+            'subcategory',
+            'location',
+            'tags',
+            'description'
+        ]
+    };
+
+    Object.entries(forms).forEach(([formId, fieldIds]) => {
+        const form = document.getElementById(formId);
+
+        // Only run on pages with this form
+        if (!form) return;
+
+        // Use our inline errors instead of browser popups
+        form.noValidate = true;
+
+        fieldIds.forEach(id => {
+            const field = document.getElementById(id);
+            if (!field) return;
+
+            field.dataset.checkField = 'true';
+
+            // Add a message below the input automatically
+            const feedback = document.createElement('p');
+            feedback.id = 'validation-' + id;
+            feedback.className = 'inline-feedback';
+            feedback.setAttribute('aria-live', 'polite');
+
+            field.insertAdjacentElement('afterend', feedback);
+
+            // Link the message to its input
+            const oldDescription =
+                field.getAttribute('aria-describedby') || '';
+
+            field.setAttribute(
+                'aria-describedby',
+                (oldDescription + ' ' + feedback.id).trim()
+            );
+
+            // Check while typing or leaving a field
+            field.addEventListener('input', () => {
+                validateFormField(field);
+            });
+
+            field.addEventListener('change', () => {
+                validateFormField(field);
+            });
+
+            field.addEventListener('blur', () => {
+                validateFormField(field);
+            });
+        });
+
+        // Stop submission if something is incorrect
+        form.addEventListener('submit', event => {
+            if (!validateAllFormFields(form)) {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+            }
+        }, true);
+    });
+
+    // Recheck Confirm Password if Create Password changes
+    const createPassword = document.getElementById(
+        'signup-password'
+    );
+
+    const confirmPassword = document.getElementById(
+        'signup-confirm-password'
+    );
+
+    if (createPassword && confirmPassword) {
+        createPassword.addEventListener('input', () => {
+            if (confirmPassword.value) {
+                validateFormField(confirmPassword);
+            }
+        });
+    }
+}
+
+
+// Run validation after the page loads
+if (document.readyState === 'loading') {
+    document.addEventListener(
+        'DOMContentLoaded',
+        setupInlineFormValidation
+    );
+} else {
+    setupInlineFormValidation();
+}
+
 
 
 

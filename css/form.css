@@ -554,3 +554,52 @@ body.dark-mode .account-feedback.success {
 }
 
 
+/* Inline Form Validation */
+
+/* Messages displayed below each field */
+.inline-feedback {
+    font-size: 14px;
+    line-height: 1.35;
+    margin: 3px 0 0;
+}
+
+/* Hide the message when there's nothing to show */
+.inline-feedback:empty {
+    display: none;
+}
+
+/* Error message */
+.inline-feedback.error {
+    color: #B42318;
+}
+
+/* Correct input message */
+.inline-feedback.success {
+    color: #166534;
+}
+
+/* Dark mode message colors */
+body.dark-mode .inline-feedback.error {
+    color: #FF9999;
+}
+
+body.dark-mode .inline-feedback.success {
+    color: #86EFAC;
+}
+
+/* Red border when something is wrong */
+#auth-form .field-error,
+#listing-form .field-error {
+    outline: 2px solid #D93025;
+    outline-offset: -2px;
+}
+
+/* Green border when the field is correct */
+#auth-form .field-valid,
+#listing-form .field-valid {
+    outline: 2px solid #188038;
+    outline-offset: -2px;
+}
+
+
+
