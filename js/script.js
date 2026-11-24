@@ -248,6 +248,9 @@ addCategoryDemoListings();
 function initializeScripts() {
     const hamburgerBtn = document.getElementById('hamburger-btn');
     const navMenu = document.getElementById('nav-menu');
+    
+    const navBackdrop = document.getElementById('nav-backdrop');
+    const navCloseBtn = document.getElementById('nav-close-btn');
     const themeSwitch = document.getElementById('theme-switch');
     const categoriesBtn = document.getElementById('categories-btn');
     const categoriesDropdown = document.getElementById('categories-dropdown');
@@ -2554,4 +2557,20 @@ if (document.readyState === 'loading') {
     setupPasswordOptions();
 }
 
+if (hamburgerBtn && navMenu) {
+    hamburgerBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = navMenu.classList.toggle('active');
+        navBackdrop?.classList.toggle('active', isOpen);
+        document.body.style.overflow = isOpen ? 'hidden' : '';
+    });
+}
 
+const closeMobileMenu = () => {
+    navMenu?.classList.remove('active');
+    navBackdrop?.classList.remove('active');
+    document.body.style.overflow = '';
+};
+
+navCloseBtn?.addEventListener('click', closeMobileMenu);
+navBackdrop?.addEventListener('click', closeMobileMenu);
