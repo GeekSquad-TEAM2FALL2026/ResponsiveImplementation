@@ -1615,7 +1615,7 @@ body.has-hero-search .search-container {
         transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
         z-index: 999;
         overflow-y: auto;
-        padding: 0 1.25rem 2rem;
+        padding: 1.5rem 1.25rem 2rem;
         display: block;
         flex-direction: column;
     }
@@ -1684,6 +1684,12 @@ body.has-hero-search .search-container {
         margin-top: 0.4rem;
         width: 100%;
         border-radius: 8px;
+    }
+
+    .nav-menu a,
+    .nav-menu .categories-list li a {
+        text-decoration: none;
+        color: var(--text-color);
     }
 }
 
