@@ -7,16 +7,33 @@
         <a href="index.html" class="brand-link">
             <svg class="peace-icon-sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="45" stroke="#8A38F5" stroke-width="8" fill="none"/>
-                <line x1="50" y1="5" x2="50" y2="95" stroke="#8A38F5" stroke-width="8"/>
-                <line x1="50" y1="50" x2="15" y2="85" stroke="#8A38F5" stroke-width="8"/>
-                <line x1="50" y1="50" x2="85" y2="85" stroke="#8A38F5" stroke-width="8"/>
+            <!-- Center line -->
+            <line x1="50" y1="8" x2="50" y2="92"
+                stroke="#8A38F5" stroke-width="8"/>
+            <!-- Left diagonal -->
+            <line x1="50" y1="50" x2="20" y2="80"
+                stroke="#8A38F5" stroke-width="8"/>
+            <!-- Right diagonal -->
+            <line x1="50" y1="50" x2="80" y2="80"
+                stroke="#8A38F5" stroke-width="8"/>
+
             </svg>
             <span class="brand-text-desktop">Craigslist</span>
         </a>
     </div>
+
+    <div class="search-container header-search js-search-container" id="header-search-container">
+        <input type="search"
+            class="search-input js-search-input"
+            placeholder="Search listings..."
+            autocomplete="off"
+            enterkeyhint="search"
+            aria-label="Search listings">
+        <ul class="dropdown-menu js-search-dropdown"></ul>
+    </div>
+
     <nav id="nav-menu" class="nav-menu">
         <ul>
-        <li class="hide-on-desktop"><a href="index.html">Home</a></li>
             <li class="nav-dropdown-container">
                 <a href="#" id="categories-btn">Categories <span id="cat-arrow">▼</span></a>
                 <!-- Category Dropdown Menu -->
@@ -46,11 +63,6 @@
             <li><a href="account.html">Account</a></li>
         </ul>
     </nav>
-
-    <div class="search-container header-search js-search-container" id="header-search-container">
-        <input type="text" class="search-input js-search-input" placeholder="Search" autocomplete="off" aria-label="Search products">
-        <ul class="dropdown-menu js-search-dropdown"></ul>
-    </div>
 
 
     <div class="theme-toggle">

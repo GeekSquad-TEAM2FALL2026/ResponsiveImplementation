@@ -1090,4 +1090,364 @@ body.dark-mode .delete-feedback.success {
     cursor: wait;
 }
 
+/* Keep the homepage logo inside the screen */
+
+.logo-container {
+    max-width: 100%;
+    min-width: 0;
+    justify-content: center;
+}
+
+.logo-container .peace-icon {
+    width: clamp(50px, 8vw, 90px);
+    height: auto;
+    flex-shrink: 0;
+    display: block;
+}
+
+.logo-container .logo-text {
+    font-size: clamp(2rem, 5vw, 4rem);
+    min-width: 0;
+}
+
+/* Smaller logo spacing on phones */
+@media (max-width: 420px) {
+    .logo-container {
+        gap: 8px;
+    }
+
+    .logo-container .logo-text {
+        font-size: clamp(1.7rem, 7.5vw, 2.5rem);
+    }
+}
+
+
+/* Categories on the homepage */
+
+.home-categories {
+    width: 100%;
+    margin-top: 30px;
+}
+
+.home-categories h2 {
+    text-align: center;
+    font-size: 22px;
+    margin-bottom: 18px;
+    color: var(--text-color);
+}
+
+.home-category-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+/* Each category is a clickable link */
+.home-category-grid a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 50px;
+    padding: 12px 8px;
+
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    text-decoration: none;
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.home-category-grid a:hover,
+.home-category-grid a:focus-visible {
+    background-color: var(--highlight);
+}
+
+.home-category-grid a:focus-visible {
+    outline: 2px solid var(--logo-color);
+    outline-offset: 2px;
+}
+
+/* Two categories per row on mobile */
+@media (max-width: 767px) {
+    .home-category-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .home-categories h2 {
+        font-size: 20px;
+    }
+
+    .home-category-grid a {
+        font-size: 14px;
+    }
+}
+
+/* X button for Reply and Saved */
+
+#reply-btn-desktop,
+#reply-btn-mobile,
+#save-btn {
+    position: relative;
+    overflow: visible;
+}
+
+/* Show X only when Reply is open or item is Saved */
+#reply-btn-desktop.reply-open::after,
+#reply-btn-mobile.reply-open::after,
+#save-btn.saved::after {
+    content: "×";
+
+    position: absolute;
+    top: -8px;
+    right: -8px;
+
+    width: 24px;
+    height: 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    border: 1px solid var(--text-color);
+
+    background-color: var(--background-color);
+    color: var(--text-color);
+
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 1;
+
+    /* Clicking the X activates its parent button */
+    pointer-events: none;
+}
+
+/* Better Homepage and Header Layout */
+
+/* Keep header items together */
+header {
+    width: 100%;
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 16px 20px;
+    gap: 16px;
+    align-items: center;
+}
+
+.header-left,
+.theme-toggle {
+    flex-shrink: 0;
+}
+
+/* Search closer to the logo on other pages */
+.header-search {
+    flex: 1 1 220px;
+    max-width: 420px;
+    min-width: 0;
+    margin: 0;
+}
+
+.header-search .search-input {
+    min-height: 46px;
+    padding: 10px 14px;
+    font-size: 16px;
+}
+
+/* The homepage already has a larger search */
+body.has-hero-search .header-search {
+    display: none !important;
+}
+
+/* Remove the empty space from the hidden header logo */
+body.has-hero-search .brand-link {
+    display: none !important;
+}
+
+/* Make homepage content start higher */
+body.has-hero-search .center-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 2rem 20px;
+}
+
+body.has-hero-search .logo-container {
+    margin-bottom: 24px;
+}
+
+body.has-hero-search .search-container {
+    margin-bottom: 12px;
+}
+
+/* Browse categories below search */
+body.has-hero-search .home-categories {
+    width: 100%;
+    margin-top: 12px;
+    margin-bottom: 24px;
+}
+
+body.has-hero-search .home-categories h2 {
+    font-size: 22px;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+body.has-hero-search .home-category-grid {
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+body.has-hero-search .home-category-grid a {
+    min-height: 52px;
+    padding: 12px;
+    font-size: 15px;
+}
+
+/* Make Create Listing stand out */
+body.has-hero-search .action-buttons .btn {
+    background-color: var(--logo-color);
+    color: white;
+    min-height: 48px;
+}
+
+body.has-hero-search .action-buttons .btn:hover {
+    background-color: var(--highlight);
+    color: var(--text-color);
+}
+
+/* Desktop header */
+@media (min-width: 768px) {
+    .nav-menu {
+        margin: 0 0 0 auto;
+        flex: 0 0 auto;
+    }
+
+    .nav-menu > ul {
+        gap: 6px;
+    }
+
+    .nav-menu a {
+        font-size: 16px;
+        padding: 8px 9px;
+    }
+
+    /* Display Home in the desktop navigation too */
+    .nav-menu .hide-on-desktop {
+        display: list-item !important;
+    }
+
+    /* Homepage doesn't need a second small logo */
+    body.has-hero-search .header-left {
+        display: none;
+    }
+
+    body.has-hero-search .nav-menu {
+        margin-left: 0;
+    }
+
+    body.has-hero-search .theme-toggle {
+        margin-left: auto;
+    }
+}
+
+/* Tablet screens */
+@media (min-width: 768px) and (max-width: 1023px) {
+    header {
+        flex-wrap: wrap;
+    }
+
+    .header-search {
+        order: 4;
+        flex: 1 1 100%;
+        max-width: 100%;
+    }
+}
+
+/* Mobile screens */
+@media (max-width: 767px) {
+    header {
+        flex-wrap: wrap;
+        padding: 12px 16px;
+        gap: 12px;
+    }
+
+    .header-left {
+        order: 1;
+    }
+
+    .theme-toggle {
+        order: 2;
+        margin-left: auto;
+    }
+
+    /* Search gets its own row on inner pages */
+    .header-search {
+        flex: 1 1 280px;
+        max-width: 480px;
+        min-width: 0;
+        margin: 0;
+}
+
+    .nav-menu {
+        top: 68px;
+        left: 16px;
+        right: 16px;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    /* Two category buttons per row on phones */
+    body.has-hero-search .home-category-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    body.has-hero-search .home-categories h2 {
+        font-size: 20px;
+    }
+}
+
+/* Space between homepage search and button */
+body.has-hero-search .search-container {
+    margin-bottom: 20px;
+}
+
+/* Homepage Header Size */
+
+@media (min-width: 768px) {
+
+    body.has-hero-search header {
+        min-height: 70px;
+        padding: 16px 28px;
+    }
+
+    /* Categories, Post, and Account */
+    body.has-hero-search .nav-menu a {
+        font-size: 16px;
+        padding: 10px 12px;
+    }
+
+    /* Give navigation links a little more space */
+    body.has-hero-search .nav-menu > ul {
+        gap: 12px;
+    }
+}
+
+
+
+
+
 

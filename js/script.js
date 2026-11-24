@@ -114,6 +114,137 @@ function showLoadingState(message, nextStep) {
 }
 
 
+// Sample Listings for Categories
+// Adds example posts for our Craigslist prototype
+
+function addCategoryDemoListings() {
+    const seedKey = 'categoryDemoListingsAdded_v1';
+
+    // Only add these examples once
+    if (localStorage.getItem(seedKey) === 'yes') return;
+
+    // Category, subcategory, title, price, location
+    const examples = [
+        // Community
+        ['community', 'groups', 'Local Gaming Club', '0', 'Charlotte, NC'],
+        ['community', 'events', 'Weekend Board Game Meetup', '0', 'Charlotte, NC'],
+        ['community', 'volunteers', 'Neighborhood Volunteer Group', '0', 'Concord, NC'],
+
+        // Services
+        ['services', 'computer', 'Computer Setup Help', '40', 'Charlotte, NC'],
+        ['services', 'labor', 'Lawn Care Service', '35', 'Matthews, NC'],
+        ['services', 'automotive', 'Mobile Car Detailing', '65', 'Charlotte, NC'],
+
+        // Housing
+        ['housing', 'rooms', 'Room for Rent Near Campus', '650', 'Charlotte, NC'],
+        ['housing', 'apartments', 'Studio Apartment', '1100', 'Charlotte, NC'],
+        ['housing', 'sublets', 'Short-Term Apartment Sublet', '850', 'Pineville, NC'],
+
+        // Autos
+        ['autos', 'cars-trucks', 'Used Compact Sedan', '5200', 'Charlotte, NC'],
+        ['autos', 'auto-parts', 'Set of Four Tires', '250', 'Huntersville, NC'],
+        ['autos', 'motorcycles', 'Used Motorcycle', '2900', 'Charlotte, NC'],
+
+        // Jobs
+        ['jobs', 'customer-service', 'Part-Time Store Associate', '17', 'Charlotte, NC'],
+        ['jobs', 'technology', 'IT Help Desk Position', '21', 'Charlotte, NC'],
+        ['jobs', 'food-hospitality', 'Restaurant Team Member', '16', 'Matthews, NC'],
+
+        // Gigs
+        ['gigs', 'creative', 'Weekend Photo Shoot', '150', 'Charlotte, NC'],
+        ['gigs', 'labor', 'Help Moving Furniture', '85', 'Concord, NC'],
+        ['gigs', 'events', 'Event Setup Help', '100', 'Charlotte, NC'],
+
+        // Discussion Forums
+        ['discussion-forums', 'hobbies', 'Talk About Video Games', '0', 'Charlotte, NC'],
+        ['discussion-forums', 'local', 'Charlotte Neighborhood Chat', '0', 'Charlotte, NC'],
+        ['discussion-forums', 'questions', 'Ask the Community', '0', 'Charlotte, NC'],
+
+        // Resumes
+        ['resumes', 'technology', 'Entry-Level IT Resume', '0', 'Charlotte, NC'],
+        ['resumes', 'customer-service', 'Customer Service Resume', '0', 'Concord, NC'],
+        ['resumes', 'creative', 'Graphic Design Portfolio', '0', 'Charlotte, NC']
+    ];
+
+    const categoryLabels = {
+        community: 'Community',
+        services: 'Services',
+        housing: 'Housing',
+        autos: 'Autos',
+        jobs: 'Jobs',
+        gigs: 'Gigs',
+        'discussion-forums': 'Discussion Forums',
+        resumes: 'Resumes'
+    };
+
+    // Simple images for example posts
+    // We can replace these with actual photos later
+    function makeDemoImage(category) {
+        const label = categoryLabels[category];
+
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600">
+            <rect width="600" height="600" fill="#D7C1F4"/>
+            <rect x="35" y="35" width="530" height="530" rx="24" fill="#EEEEEE"/>
+
+            <text x="300" y="275" text-anchor="middle" fill="#484848"
+                font-family="Arial" font-weight="bold" font-size="42">${label}</text>
+
+            <text x="300" y="330" text-anchor="middle" fill="#8A38F5"
+                font-family="Arial" font-size="28">SAMPLE LISTING</text>
+        </svg>`;
+
+        return 'data:image/svg+xml;charset=UTF-8,' +
+            encodeURIComponent(svg);
+    }
+
+    try {
+        // Get listings that are already saved
+        const existing = JSON.parse(
+            localStorage.getItem('userListings') || '[]'
+        );
+
+        if (!Array.isArray(existing)) return;
+
+        examples.forEach((data, index) => {
+            const [category, subcategory, title, price, location] = data;
+            const id = 'demo-category-' + index;
+
+            // Prevent duplicate listings
+            if (existing.some(listing => String(listing.id) === id)) {
+                return;
+            }
+
+            // Use the same data as our normal posts
+            existing.push({
+                id: id,
+                owner: '__demo_example__',
+                title: title,
+                category: category,
+                subcategory: subcategory,
+                price: price,
+                location: location,
+                tags: 'Demo Listing',
+                description: 'This is a sample post for our class prototype, not a real listing.',
+                images: [makeDemoImage(category)],
+                timestamp: 'Sample',
+                isDemo: true
+            });
+        });
+
+        // Save all listings
+        localStorage.setItem('userListings', JSON.stringify(existing));
+
+        // Remember that we already added the examples
+        localStorage.setItem(seedKey, 'yes');
+
+    } catch (error) {
+        console.warn('Could not add sample listings:', error);
+    }
+}
+
+// Add examples before the normal listings load
+addCategoryDemoListings();
+
 function initializeScripts() {
     const hamburgerBtn = document.getElementById('hamburger-btn');
     const navMenu = document.getElementById('nav-menu');
@@ -698,19 +829,52 @@ function filterListingsOnPage(queryText) {
     const replyDesktop = document.getElementById('reply-btn-desktop');
     const saveBtn = document.getElementById('save-btn');
 
+    
+    // Reply Button - Open and Close
+
     if (replyPanel) {
+
         function toggleReplyPanel() {
-            const isHidden = replyPanel.hasAttribute('hidden');
-            if (isHidden) {
-                replyPanel.removeAttribute('hidden');
-                replyPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            } else {
-                replyPanel.setAttribute('hidden', '');
+            const opening = replyPanel.hidden;
+
+            // Open or close the seller information
+            replyPanel.hidden = !opening;
+
+            // Show an X on the Reply button when opened
+            [replyMobile, replyDesktop].forEach(button => {
+                if (!button) return;
+
+                button.classList.toggle('reply-open', opening);
+
+                button.setAttribute(
+                    'aria-expanded',
+                    String(opening)
+                );
+
+                button.setAttribute(
+                    'aria-label',
+                    opening ? 'Close reply details' : 'Reply to seller'
+                );
+            });
+
+            // Scroll to seller information when opened
+            if (opening) {
+                replyPanel.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest'
+                });
             }
         }
-        if (replyMobile) replyMobile.addEventListener('click', toggleReplyPanel);
-        if (replyDesktop) replyDesktop.addEventListener('click', toggleReplyPanel);
+
+        if (replyMobile) {
+            replyMobile.addEventListener('click', toggleReplyPanel);
+        }
+
+        if (replyDesktop) {
+            replyDesktop.addEventListener('click', toggleReplyPanel);
+        }
     }
+
 
     
 // Save and remove favorite listings
