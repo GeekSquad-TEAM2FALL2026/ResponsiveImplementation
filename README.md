@@ -1,5 +1,10 @@
 # ResponsiveImplementation
 
+
+live URL
+# Option 1: Web browser
+1. Open: https://geeksquad-team2fall2026.github.io/ResponsiveImplementation/
+
 Running Locally
 # Option 1: Web browser
 1. Extract the files localy on your machine
