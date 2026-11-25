@@ -1481,14 +1481,6 @@ body.has-hero-search .action-buttons .btn:hover {
     body.has-hero-search .header-left {
         display: none;
     }
-
-    body.has-hero-search .nav-menu {
-        margin-left: 0;
-    }
-
-    body.has-hero-search .theme-toggle {
-        margin-left: auto;
-    }
 }
 
 /* Tablet screens */
@@ -1555,21 +1547,8 @@ body.has-hero-search .search-container {
 /* Homepage Header Size */
 
 @media (min-width: 768px) {
-
     body.has-hero-search header {
-        min-height: 70px;
-        padding: 16px 28px;
-    }
-
-    /* Categories, Post, and Account */
-    body.has-hero-search .nav-menu a {
-        font-size: 16px;
-        padding: 10px 12px;
-    }
-
-    /* Give navigation links a little more space */
-    body.has-hero-search .nav-menu > ul {
-        gap: 12px;
+        min-height: 78px;
     }
 }
 
